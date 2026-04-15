@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEB ExamPortal — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════ TOKENS ══════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#1a56db;
+  --primary-lt:#ebf0fd;
+  --primary-dk:#1341b0;
+  --bg:#f0f4fa;
+  --white:#ffffff;
+  --surface:#f7f9fe;
+  --border:#d5e0f5;
+  --border2:#b8cef0;
+  --text:#111827;
+  --text2:#4b5563;
+  --text3:#9ca3af;
+  --green:#059669;--green-lt:#ecfdf5;--green-b:rgba(5,150,105,.18);
+  --amber:#d97706;--amber-lt:#fffbeb;--amber-b:rgba(217,119,6,.18);
+  --red:#dc2626;--red-lt:#fef2f2;--red-b:rgba(220,38,38,.18);
+  --blue:#2563eb;--blue-lt:#eff6ff;--blue-b:rgba(37,99,235,.15);
+  --teal:#0891b2;--teal-lt:#ecfeff;--teal-b:rgba(8,145,178,.15);
+  --purple:#7c3aed;--purple-lt:#f5f3ff;--purple-b:rgba(124,58,237,.15);
+  --shadow:0 1px 3px rgba(26,86,219,.07),0 2px 8px rgba(26,86,219,.05);
+  --shadow-md:0 4px 16px rgba(26,86,219,.1);
+  --sb:240px;--r:12px;--r-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}
+
+/* ══════════════ TOP ACCENT ══════════════ */
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),#3b82f6,#06b6d4);z-index:1000}
+
+/* ══════════════ SIDEBAR ══════════════ */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:var(--sb);
+  background:var(--white);border-right:1.5px solid var(--border);
+  display:flex;flex-direction:column;z-index:200;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  box-shadow:2px 0 12px rgba(26,86,219,.06);
+}
+.sb-logo{padding:20px 18px 16px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:11px}
+.sb-logo-icon{width:36px;height:36px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2}
+.sb-logo-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.sb-logo-name span{color:var(--primary)}
+.sb-logo-tag{font-size:9.5px;color:var(--text3);font-weight:500;letter-spacing:.3px;margin-top:1px}
+
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);padding:12px 8px 5px}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:500;
+  color:var(--text2);transition:all .15s;margin-bottom:2px;position:relative;
+}
+.sb-item:hover{background:var(--primary-lt);color:var(--primary)}
+.sb-item.active{background:var(--primary-lt);color:var(--primary);font-weight:700}
+.sb-item.active::before{content:'';position:absolute;left:0;top:22%;bottom:22%;width:3px;background:var(--primary);border-radius:0 3px 3px 0}
+.sb-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sb-badge.blue{background:var(--blue-lt);color:var(--blue)}
+.sb-badge.red{background:var(--red-lt);color:var(--red)}
+.sb-badge.green{background:var(--green-lt);color:var(--green)}
+
+.sb-user{padding:14px;border-top:1.5px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-user:hover{background:var(--surface)}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:12.5px;font-weight:700;color:var(--text)}
+.sb-user-role{font-size:11px;color:var(--text3)}
+
+/* ══════════════ MAIN ══════════════ */
+.main{margin-left:var(--sb);min-height:100vh;display:flex;flex-direction:column;padding-top:3px}
+
+/* ══════════════ TOPBAR ══════════════ */
+.topbar{
+  position:sticky;top:3px;z-index:100;
+  background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);
+  border-bottom:1.5px solid var(--border);
+  height:60px;padding:0 24px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 1px 8px rgba(26,86,219,.07);
+}
+.hamburger{display:none;background:none;border:1.5px solid var(--border);color:var(--text2);width:36px;height:36px;border-radius:var(--r-sm);align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.hamburger:hover{border-color:var(--primary);color:var(--primary)}
+.hamburger svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+.tb-title{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.tb-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.tb-space{flex:1}
+.tb-live{display:flex;align-items:center;gap:6px;background:var(--green-lt);border:1.5px solid var(--green-b);border-radius:var(--r-sm);padding:5px 11px;font-size:12px;font-weight:700;color:var(--green)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;width:200px}
+.tb-search svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;flex-shrink:0}
+.tb-search input{background:none;border:none;outline:none;font-size:13px;color:var(--text);width:100%}
+.tb-search input::placeholder{color:var(--text3)}
+.tb-btn{width:36px;height:36px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--white);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative}
+.tb-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-lt)}
+.tb-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.tb-btn.logout{border-color:rgba(220,38,38,.25);color:var(--red)}
+.tb-btn.logout:hover{background:var(--red-lt);border-color:rgba(220,38,38,.4)}
+.notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
+.session-chip{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:5px 11px;font-size:12px;font-weight:600;color:var(--text2)}
+.session-chip svg{width:13px;height:13px;stroke:var(--green);fill:none;stroke-width:2.5}
+
+/* ══════════════ CONTENT ══════════════ */
+.content{padding:22px 24px;flex:1}
+.page{display:none}
+.page.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════ CARD ══════════════ */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.card-hd{padding:16px 18px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.card-title{font-size:14px;font-weight:800;color:var(--text)}
+.card-sub{font-size:11.5px;color:var(--text3);margin-top:2px}
+.card-bd{padding:14px 18px 18px}
+
+/* ══════════════ STAT CARDS ══════════════ */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--border2)}
+.stat-stripe{position:absolute;top:0;left:0;right:0;height:3px}
+.stat-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.stat-icon svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2}
+.stat-delta{font-size:12px;font-weight:700;display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px}
+.stat-val{font-size:28px;font-weight:800;letter-spacing:-1.5px;font-family:'DM Mono',monospace;margin-bottom:3px}
+.stat-lbl{font-size:12.5px;color:var(--text2);font-weight:500}
+
+/* ══════════════ GRIDS ══════════════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g32{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.g41{display:grid;grid-template-columns:3fr 1fr;gap:16px;margin-bottom:16px}
+
+/* ══════════════ TABLE ══════════════ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:9px 13px;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text3);border-bottom:1.5px solid var(--border);background:var(--surface);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface)}
+td{padding:11px 13px;vertical-align:middle}
+
+/* ══════════════ PILLS ══════════════ */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.1px}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.p-live{background:var(--green-lt);color:var(--green)}
+.p-upcoming{background:var(--amber-lt);color:var(--amber)}
+.p-ended{background:#f3f4f6;color:#6b7280}
+.p-graded{background:var(--blue-lt);color:var(--blue)}
+.p-flagged{background:var(--red-lt);color:var(--red)}
+.p-on{background:var(--green-lt);color:var(--green)}
+.p-off{background:var(--red-lt);color:var(--red)}
+
+/* ══════════════ BUTTONS ══════════════ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r-sm);font-size:12.5px;font-weight:700;border:none;cursor:pointer;transition:all .15s;letter-spacing:.1px}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dk);box-shadow:0 4px 12px rgba(26,86,219,.3)}
+.btn-outline{background:var(--white);color:var(--text2);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-lt)}
+.btn-danger{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red-b)}
+.btn-danger:hover{background:#fee2e2}
+.btn-success{background:var(--green-lt);color:var(--green);border:1.5px solid var(--green-b)}
+.btn-success:hover{background:#d1fae5}
+.btn-sm{padding:5px 10px;font-size:11.5px}
+
+/* ══════════════ FORM ══════════════ */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.fg-full{grid-column:1/-1}
+.fg-actions{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.2px}
+.form-input{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;font-size:13.5px;color:var(--text);outline:none;transition:border .15s,box-shadow .15s;width:100%}
+.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,86,219,.1);background:#fff}
+.form-input::placeholder{color:var(--text3)}
+select.form-input option{background:#fff}
+
+/* ══════════════ PROGRESS BAR ══════════════ */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.prog-label{font-size:12.5px;font-weight:500;color:var(--text2);width:90px;flex-shrink:0}
+.prog-track{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.prog-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.prog-val{font-size:12px;font-weight:700;min-width:36px;text-align:right;font-family:'DM Mono',monospace}
+
+/* ══════════════ ACTIVITY ══════════════ */
+.feed-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.feed-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.feed-main{font-size:12.5px;color:var(--text2);line-height:1.45;flex:1}
+.feed-main strong{color:var(--text);font-weight:700}
+.feed-time{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ══════════════ TOGGLE ══════════════ */
+.toggle{position:relative;width:38px;height:21px;flex-shrink:0}
+.toggle input{display:none}
+.tog-track{position:absolute;inset:0;border-radius:20px;background:#e5e7eb;border:1.5px solid var(--border2);cursor:pointer;transition:all .2s}
+.toggle input:checked+.tog-track{background:var(--primary);border-color:var(--primary)}
+.tog-thumb{position:absolute;top:3px;left:3px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked~.tog-thumb{transform:translateX(17px)}
+
+/* ══════════════ INFO ROWS ══════════════ */
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px}
+.info-label{font-size:12.5px;color:var(--text2);font-weight:500}
+.info-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)}
+
+/* ══════════════ ALERT STRIPS ══════════════ */
+.alert{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-radius:var(--r-sm);margin-bottom:12px;font-size:13px;font-weight:500;line-height:1.4}
+.alert svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;margin-top:1px}
+.a-warn{background:var(--amber-lt);border:1.5px solid var(--amber-b);color:var(--amber)}
+.a-err{background:var(--red-lt);border:1.5px solid var(--red-b);color:var(--red)}
+.a-info{background:var(--blue-lt);border:1.5px solid var(--blue-b);color:var(--blue)}
+.a-ok{background:var(--green-lt);border:1.5px solid var(--green-b);color:var(--green)}
+
+/* ══════════════ TABS ══════════════ */
+.tab-bar{display:flex;gap:2px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:3px;margin-bottom:14px;width:fit-content}
+.tab{padding:6px 14px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;transition:all .15s}
+.tab.active{background:var(--white);color:var(--primary);font-weight:700;box-shadow:var(--shadow)}
+
+/* ══════════════ CHART ══════════════ */
+.chart-box{position:relative;height:200px;margin-top:10px}
+
+/* ══════════════ UPCOMING EXAM ══════════════ */
+.exam-row-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.exam-row-item:last-child{border-bottom:none}
+.exam-date{background:var(--primary-lt);border:1.5px solid rgba(26,86,219,.15);border-radius:var(--r-sm);padding:6px 10px;text-align:center;flex-shrink:0;min-width:46px}
+.exam-day{font-size:18px;font-weight:800;font-family:'DM Mono',monospace;color:var(--primary);line-height:1}
+.exam-mon{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-top:1px}
+.exam-name{font-size:13px;font-weight:700;color:var(--text)}
+.exam-meta{font-size:11.5px;color:var(--text3);margin-top:2px}
+
+/* ══════════════ MODAL ══════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);width:min(520px,100%);max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-md)}
+.modal-hd{padding:20px 22px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:16px;font-weight:800;color:var(--text)}
+.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px;transition:all .15s}
+.modal-close:hover{background:var(--red-lt);color:var(--red)}
+.modal-bd{padding:0 22px 22px}
+
+/* ══════════════ FILTER BAR ══════════════ */
+.filter-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.filter-search{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;flex:1;min-width:160px}
+.filter-search svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;flex-shrink:0}
+.filter-search input{background:none;border:none;outline:none;font-size:13px;color:var(--text);width:100%}
+.filter-select{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;font-size:13px;color:var(--text2);outline:none;cursor:pointer}
+.filter-select:focus{border-color:var(--primary)}
+
+/* ══════════════ SUBJECT TAG ══════════════ */
+.s-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px}
+
+/* ══════════════ SCORE BAR ══════════════ */
+.score-row{display:flex;align-items:center;gap:8px}
+.score-track{flex:1;height:6px;background:var(--surface);border-radius:3px;overflow:hidden;border:1px solid var(--border)}
+.score-fill{height:100%;border-radius:3px}
+.score-val{font-size:11.5px;font-weight:700;font-family:'DM Mono',monospace;min-width:34px;text-align:right}
+
+/* ══════════════ TOAST ══════════════ */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:none}
+.toast-inner{background:#fff;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;font-size:13.5px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-md)}
+
+/* ══════════════ OVERLAY ══════════════ */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:199}
+
+/* ══════════════ PAGE HEADER ══════════════ */
+.page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.page-title{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.page-sub{font-size:13px;color:var(--text3);margin-top:2px}
+
+/* ══════════════ SCROLLBAR ══════════════ */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+
+/* ══════════════ RESPONSIVE ══════════════ */
+@media(max-width:1100px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .g32,.g41{grid-template-columns:1fr}
+}
+@media(max-width:800px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none;box-shadow:4px 0 20px rgba(0,0,0,.15)}
+  .sb-overlay.open{display:block}
+  .main{margin-left:0}
+  .hamburger{display:flex}
+  .tb-search,.session-chip{display:none}
+  .g2{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .content{padding:14px}
+  .topbar{padding:0 14px;gap:8px}
+}
+@media(max-width:520px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .stat-val{font-size:22px}
+  .page-hd{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- SESSION GUARD -->
+<script>
+(function(){
+  var raw = localStorage.getItem('seb_admin_session');
+  if(!raw){ window.location.replace('seb_admin_login.html'); return; }
+  try{
+    var sess = JSON.parse(raw);
+    if(!sess || !sess.loggedIn){ window.location.replace('seb_admin_login.html'); return; }
+    var age = Date.now() - new Date(sess.loginTime).getTime();
+    if(age > 3600000){
+      localStorage.removeItem('seb_admin_session');
+      window.location.replace('seb_admin_login.html');
+      return;
+    }
+  } catch(e){
+    localStorage.removeItem('seb_admin_session');
+    window.location.replace('seb_admin_login.html');
+    return;
+  }
+})();
+window.doLogout = function(){
+  if(confirm('Are you sure you want to sign out?')){
+    localStorage.removeItem('seb_admin_session');
+    window.location.replace('seb_admin_login.html');
+  }
+};
+</script>
+
+<!-- MODALS -->
+<div class="modal-bg" id="m-exam">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Create New Exam</div><button class="modal-close" onclick="closeM('m-exam')">×</button></div>
+    <div class="modal-bd">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Exam Title</label><input class="form-input" placeholder="e.g. Mid-Term Physics 2025"></div>
+        <div class="form-group"><label class="form-label">Subject</label><select class="form-input"><option>Physics</option><option>Mathematics</option><option>Chemistry</option><option>English</option><option>Computer Science</option><option>Biology</option></select></div>
+        <div class="form-group"><label class="form-label">Exam Date</label><input class="form-input" type="date"></div>
+        <div class="form-group"><label class="form-label">Start Time</label><input class="form-input" type="time"></div>
+        <div class="form-group"><label class="form-label">Duration (minutes)</label><input class="form-input" type="number" placeholder="180"></div>
+        <div class="form-group"><label class="form-label">Total Marks</label><input class="form-input" type="number" placeholder="100"></div>
+        <div class="form-group"><label class="form-label">Cut-off / Pass Marks</label><input class="form-input" type="number" placeholder="40"></div>
+        <div class="form-group"><label class="form-label">Exam Hall</label><select class="form-input"><option>Hall A</option><option>Hall B</option><option>Hall C</option><option>Lab 1</option><option>Online</option></select></div>
+        <div class="form-group fg-full"><label class="form-label">Assign Question Set</label><select class="form-input"><option>QS-Physics-2025-A</option><option>QS-Math-2025</option><option>QS-General-2025</option></select></div>
+        <div class="form-group fg-full"><label class="form-label">Instructions for Students</label><textarea class="form-input" rows="3" placeholder="Enter exam instructions…"></textarea></div>
+        <div class="form-group"><label class="form-label">Enable Proctoring</label><label class="toggle" style="margin-top:6px"><input type="checkbox" checked><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
+        <div class="form-group"><label class="form-label">SEB Lock Mode</label><label class="toggle" style="margin-top:6px"><input type="checkbox" checked><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
+        <div class="fg-actions"><button class="btn btn-outline" onclick="closeM('m-exam')">Cancel</button><button class="btn btn-primary" onclick="toast('✅','Exam created and published!');;closeM('m-exam')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Create Exam</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-student">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Add Student / Candidate</div><button class="modal-close" onclick="closeM('m-student')">×</button></div>
+    <div class="modal-bd">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" placeholder="Student full name"></div>
+        <div class="form-group"><label class="form-label">Student ID</label><input class="form-input" placeholder="STU2025001"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="student@email.com"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label class="form-label">Department</label><select class="form-input"><option>Computer Science</option><option>Physics</option><option>Mathematics</option><option>Chemistry</option></select></div>
+        <div class="form-group"><label class="form-label">Semester</label><select class="form-input"><option>1st</option><option>2nd</option><option>3rd</option><option>4th</option><option>5th</option><option>6th</option></select></div>
+        <div class="form-group fg-full"><label class="form-label">Assign to Exam(s)</label><select class="form-input" multiple style="height:72px"><option>Mid-Term Physics</option><option>Calculus Final</option><option>English Literature</option></select></div>
+        <div class="fg-actions"><button class="btn btn-outline" onclick="closeM('m-student')">Cancel</button><button class="btn btn-primary" onclick="toast('✅','Student added successfully!');closeM('m-student')"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Add Student</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-qb">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Add Question to Bank</div><button class="modal-close" onclick="closeM('m-qb')">×</button></div>
+    <div class="modal-bd">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Subject</label><select class="form-input"><option>Physics</option><option>Mathematics</option><option>Chemistry</option><option>English</option></select></div>
+        <div class="form-group"><label class="form-label">Topic</label><input class="form-input" placeholder="e.g. Kinematics"></div>
+        <div class="form-group"><label class="form-label">Question Type</label><select class="form-input"><option>MCQ</option><option>True/False</option><option>Short Answer</option><option>Long Answer</option></select></div>
+        <div class="form-group"><label class="form-label">Difficulty</label><select class="form-input"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+        <div class="form-group"><label class="form-label">Marks</label><input class="form-input" type="number" placeholder="2"></div>
+        <div class="form-group"><label class="form-label">Question Set Tag</label><input class="form-input" placeholder="QS-Physics-2025-A"></div>
+        <div class="form-group fg-full"><label class="form-label">Question Text</label><textarea class="form-input" rows="3" placeholder="Enter the question…"></textarea></div>
+        <div class="form-group fg-full"><label class="form-label">Options (MCQ — one per line)</label><textarea class="form-input" rows="4" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"></textarea></div>
+        <div class="form-group fg-full"><label class="form-label">Correct Answer</label><input class="form-input" placeholder="e.g. Option A"></div>
+        <div class="fg-actions"><button class="btn btn-outline" onclick="closeM('m-qb')">Cancel</button><button class="btn btn-primary" onclick="toast('✅','Question added to Question Bank!');closeM('m-qb')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Question</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-notice">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Send Notice / Email</div><button class="modal-close" onclick="closeM('m-notice')">×</button></div>
+    <div class="modal-bd">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Send To</label><select class="form-input"><option>All Students</option><option>Specific Exam Group</option><option>All Admins</option></select></div>
+        <div class="form-group"><label class="form-label">Channel</label><select class="form-input"><option>Email</option><option>Portal Notification</option><option>Both</option></select></div>
+        <div class="form-group fg-full"><label class="form-label">Subject / Title</label><input class="form-input" placeholder="Notice subject…"></div>
+        <div class="form-group fg-full"><label class="form-label">Message</label><textarea class="form-input" rows="4" placeholder="Type your notice here…"></textarea></div>
+        <div class="fg-actions"><button class="btn btn-outline" onclick="closeM('m-notice')">Cancel</button><button class="btn btn-primary" onclick="toast('📤','Notice sent successfully!');closeM('m-notice')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send Now</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><div class="toast-inner"><span id="toast-ico">✅</span><span id="toast-msg"></span></div></div>
+
+<!-- LAYOUT -->
+<div style="display:flex;min-height:100vh">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div><div class="sb-logo-name">SEB<span>Portal</span></div><div class="sb-logo-tag">Admin Console</div></div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Main</div>
+    <div class="sb-item active" onclick="nav(this,'pg-dash')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+    <div class="sb-item" onclick="nav(this,'pg-exams')"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Exam Manager<span class="sb-badge blue">3</span></div>
+    <div class="sb-item" onclick="nav(this,'pg-students')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Students<span class="sb-badge red">3</span></div>
+    <div class="sb-item" onclick="nav(this,'pg-results')"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Results</div>
+    <div class="sb-item" onclick="nav(this,'pg-qb')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Question Bank<span class="sb-badge green">QB</span></div>
+    <div class="sb-section">Control</div>
+    <div class="sb-item" onclick="nav(this,'pg-proctor')"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Proctoring<span class="sb-badge red">2</span></div>
+    <div class="sb-item" onclick="nav(this,'pg-cutoff')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Cut-off &amp; Grading</div>
+    <div class="sb-item" onclick="nav(this,'pg-users')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>User IDs &amp; Access</div>
+    <div class="sb-item" onclick="nav(this,'pg-notices')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Notices &amp; Email</div>
+    <div class="sb-item" onclick="nav(this,'pg-settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 0-14.14 0M14.83 9.17a4 4 0 0 0-5.66 0M20.49 20.49l-16.98-16.98"/></svg>Settings</div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sb-av">AD</div>
+    <div><div class="sb-user-name" id="sb-name">Super Admin</div><div class="sb-user-role" id="sb-role">admin@sebportal.in</div></div>
+  </div>
+</aside>
+<div class="sb-overlay" id="sb-ov" onclick="closeSb()"></div>
+
+<!-- MAIN -->
+<div class="main">
+<header class="topbar">
+  <button class="hamburger" onclick="toggleSb()"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub" id="tb-date"></div></div>
+  <div class="tb-space"></div>
+  <div class="session-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="sess-name">Admin</span>&nbsp;<span style="color:var(--text3)">·</span>&nbsp;<span id="sess-timer" style="font-family:'DM Mono',monospace;font-size:11px">00:00</span></div>
+  <div class="tb-live"><span class="live-dot"></span>3 Live Exams</div>
+  <div class="tb-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search exams, students…"></div>
+  <button class="tb-btn" onclick="openM('m-notice')" title="Send Notice"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-dot"></span></button>
+  <button class="tb-btn logout" onclick="doLogout()" title="Sign Out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+</header>
+
+<div class="content">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page active" id="pg-dash">
+  <div class="stats-row">
+    <div class="stat" onclick="nav(document.querySelectorAll('.sb-item')[2],'pg-students')">
+      <div class="stat-stripe" style="background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div>
+      <div class="stat-hd">
+        <div class="stat-icon" style="background:var(--purple-lt);color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <span class="stat-delta" style="background:var(--green-lt);color:var(--green)">▲ 8.2%</span>
+      </div>
+      <div class="stat-val" style="color:var(--purple)" id="s-students">2,847</div>
+      <div class="stat-lbl">Registered Students</div>
+    </div>
+    <div class="stat" onclick="nav(document.querySelectorAll('.sb-item')[1],'pg-exams')">
+      <div class="stat-stripe" style="background:linear-gradient(90deg,#059669,#34d399)"></div>
+      <div class="stat-hd">
+        <div class="stat-icon" style="background:var(--green-lt);color:var(--green)"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></div>
+        <span class="stat-delta" style="background:var(--green-lt);color:var(--green)">● Live</span>
+      </div>
+      <div class="stat-val" style="color:var(--green)" id="s-exams">38</div>
+      <div class="stat-lbl">Total Exams</div>
+    </div>
+    <div class="stat" onclick="nav(document.querySelectorAll('.sb-item')[4],'pg-qb')">
+      <div class="stat-stripe" style="background:linear-gradient(90deg,#1a56db,#60a5fa)"></div>
+      <div class="stat-hd">
+        <div class="stat-icon" style="background:var(--blue-lt);color:var(--blue)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <span class="stat-delta" style="background:var(--green-lt);color:var(--green)">▲ 23</span>
+      </div>
+      <div class="stat-val" style="color:var(--blue)" id="s-qb">1,204</div>
+      <div class="stat-lbl">Question Bank</div>
+    </div>
+    <div class="stat" onclick="nav(document.querySelectorAll('.sb-item')[3],'pg-results')">
+      <div class="stat-stripe" style="background:linear-gradient(90deg,#0891b2,#22d3ee)"></div>
+      <div class="stat-hd">
+        <div class="stat-icon" style="background:var(--teal-lt);color:var(--teal)"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <span class="stat-delta" style="background:var(--green-lt);color:var(--green)">▲ 1.8%</span>
+      </div>
+      <div class="stat-val" style="color:var(--teal)">74.3%</div>
+      <div class="stat-lbl">Avg Pass Rate</div>
+    </div>
+  </div>
+
+  <div class="alert a-warn">
+    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <div><strong>3 students flagged</strong> for suspicious activity during Calculus Final. <span style="cursor:pointer;font-weight:700;text-decoration:underline" onclick="nav(document.querySelectorAll('.sb-item')[5],'pg-proctor')">Review in Proctoring →</span></div>
+  </div>
+
+  <div class="g32">
+    <div class="card">
+      <div class="card-hd">
+        <div><div class="card-title">Score Distribution by Subject</div><div class="card-sub">Average scores this week</div></div>
+        <div class="tab-bar" style="margin-bottom:0">
+          <button class="tab active" onclick="switchChart('week',this)">Week</button>
+          <button class="tab" onclick="switchChart('month',this)">Month</button>
+        </div>
+      </div>
+      <div class="card-bd"><div class="chart-box"><canvas id="barChart"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Live Monitor</div><div class="card-sub">Right now</div></div>
+      <div class="card-bd">
+        <div class="info-row"><span class="info-label">Online Students</span><span class="info-val" style="color:var(--green)" id="lv-on">241</span></div>
+        <div class="info-row"><span class="info-label">Submitted</span><span class="info-val" style="color:var(--blue)" id="lv-sub">187</span></div>
+        <div class="info-row"><span class="info-label">Flagged</span><span class="info-val" style="color:var(--red)" id="lv-flag">3</span></div>
+        <div class="info-row"><span class="info-label">Absent</span><span class="info-val" style="color:var(--amber)" id="lv-abs">14</span></div>
+        <div class="info-row"><span class="info-label">SEB Lock Active</span><span class="info-val" style="color:var(--green)">✓ 241</span></div>
+        <div class="info-row"><span class="info-label">Cut-off (Pass)</span><span class="info-val">40 / 100</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g32">
+    <div class="card">
+      <div class="card-hd">
+        <div><div class="card-title">Active &amp; Upcoming Exams</div></div>
+        <button class="btn btn-primary btn-sm" onclick="openM('m-exam')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Exam</button>
+      </div>
+      <div class="card-bd" style="padding-top:10px">
+        <div class="tbl-wrap"><table><thead><tr><th>Exam</th><th>Students</th><th>Status</th><th>Cut-off</th><th>Action</th></tr></thead><tbody id="dash-tbl"></tbody></table></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Live Activity</div></div>
+      <div class="card-bd" id="dash-feed"></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Subject Pass Rates</div><div class="card-sub">Current term</div></div>
+      <div class="card-bd" id="subj-prog"></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Upcoming Schedule</div><div class="card-sub">Next 7 days</div></div>
+      <div class="card-bd" id="upcoming-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXAM MANAGER ══ -->
+<div class="page" id="pg-exams">
+  <div class="page-hd"><div><div class="page-title">Exam Manager</div>
+<!-- Added: Question Bank Upload -->
+<div class="card">
+  <div class="card-hd"><div class="card-title">Question Bank Upload</div></div>
+  <div class="card-bd">
+    <input type="file" id="qbUpload" multiple>
+    <ul id="qbList"></ul>
+  </div>
+</div>
+
+<!-- Added: Live Attendance -->
+<div class="card">
+  <div class="card-hd"><div class="card-title">Live Attendance</div></div>
+  <div class="card-bd">
+    <div>Registered: <span id="regCount">0</span></div>
+    <div>Present: <span id="preCount">0</span></div>
+    <div>Absent: <span id="absCount">0</span></div>
+    <table><thead><tr><th>ID</th><th>Name</th><th>Status</th></tr></thead>
+    <tbody id="attBody"></tbody></table>
+  </div>
+</div>
+<script>
+document.getElementById('qbUpload').addEventListener('change',function(){
+  let list=document.getElementById('qbList');
+  list.innerHTML='';
+  [...this.files].forEach(f=>{
+    let li=document.createElement('li');
+    li.textContent=f.name;
+    list.appendChild(li);
+  });
+});
+
+function loadAttendance(){
+ let data=[
+   {id:1,name:'Amit',status:'Present'},
+   {id:2,name:'Riya',status:'Absent'},
+   {id:3,name:'Kiran',status:'Present'}
+ ];
+ document.getElementById('regCount').textContent=data.length;
+ let p=data.filter(x=>x.status=='Present').length;
+ document.getElementById('preCount').textContent=p;
+ document.getElementById('absCount').textContent=data.length-p;
+ document.getElementById('attBody').innerHTML=data.map(d=>`<tr><td>${d.id}</td><td>${d.name}</td><td>${d.status}</td></tr>`).join('');
+}
+setInterval(loadAttendance,3000);
+loadAttendance();
+</script>
+<div class="page-sub">Create, schedule and control all exams</div></div><button class="btn btn-primary" onclick="openM('m-exam')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Exam</button></div>
+  <div class="filter-bar">
+    <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search exams…" oninput="filterExams(this.value)"></div>
+    <select class="filter-select" onchange="filterExamSt(this.value)"><option value="">All Status</option><option>Live</option><option>Upcoming</option><option>Ended</option><option>Graded</option></select>
+  </div>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Exam Title</th><th>Subject</th><th>Date</th><th>Duration</th><th>Students</th><th>Cut-off</th><th>Status</th><th>Proctor</th><th>Actions</th></tr></thead><tbody id="exam-tbl"></tbody></table></div></div>
+</div>
+
+<!-- ══ STUDENTS ══ -->
+<div class="page" id="pg-students">
+  <div class="page-hd"><div><div class="page-title">Students</div><div class="page-sub">Manage candidates, access &amp; credentials</div></div><button class="btn btn-primary" onclick="openM('m-student')"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Add Student</button></div>
+  <div class="filter-bar">
+    <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search by name or ID…" oninput="filterStudents(this.value)"></div>
+    <select class="filter-select" onchange="filterStudSt(this.value)"><option value="">All Status</option><option>Enabled</option><option>Disabled</option><option>Flagged</option></select>
+  </div>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Student ID</th><th>Name</th><th>Department</th><th>Sem</th><th>Exams</th><th>Status</th><th>Access</th><th>Actions</th></tr></thead><tbody id="stud-tbl"></tbody></table></div></div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div class="page" id="pg-results">
+  <div class="page-hd"><div><div class="page-title">Results</div><div class="page-sub">Latest graded exam results</div></div></div>
+  <div class="tab-bar" id="res-tabs"><button class="tab active" onclick="switchRes(this,'all')">All</button><button class="tab" onclick="switchRes(this,'pass')">Passed</button><button class="tab" onclick="switchRes(this,'fail')">Failed</button></div>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Student</th><th>Exam</th><th>Marks</th><th>Score</th><th>Grade</th><th>Status</th></tr></thead><tbody id="res-tbl"></tbody></table></div></div>
+</div>
+
+<!-- ══ QUESTION BANK ══ -->
+<div class="page" id="pg-qb">
+  <div class="page-hd"><div><div class="page-title">Question Bank</div><div class="page-sub">Manage and assign question sets to exams</div></div><button class="btn btn-primary" onclick="openM('m-qb')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Question</button></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div class="card-title">All Questions</div></div>
+      <div class="card-bd" style="padding-top:10px"><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Topic</th><th>Type</th><th>Difficulty</th><th>Marks</th><th>Set Tag</th><th>Actions</th></tr></thead><tbody id="qb-tbl"></tbody></table></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card"><div class="card-hd"><div class="card-title">QB Summary</div></div><div class="card-bd">
+        <div class="info-row"><span class="info-label">Total Questions</span><span class="info-val" style="color:var(--blue)">1,204</span></div>
+        <div class="info-row"><span class="info-label">Physics</span><span class="info-val">312</span></div>
+        <div class="info-row"><span class="info-label">Mathematics</span><span class="info-val">298</span></div>
+        <div class="info-row"><span class="info-label">Chemistry</span><span class="info-val">187</span></div>
+        <div class="info-row"><span class="info-label">CS</span><span class="info-val">264</span></div>
+        <div style="margin-top:10px">
+          <div class="prog-row"><span class="prog-label">MCQ</span><div class="prog-track"><div class="prog-fill" style="width:68%;background:var(--blue)"></div></div><span class="prog-val" style="color:var(--blue)">68%</span></div>
+          <div class="prog-row"><span class="prog-label">Short Ans</span><div class="prog-track"><div class="prog-fill" style="width:20%;background:var(--purple)"></div></div><span class="prog-val" style="color:var(--purple)">20%</span></div>
+          <div class="prog-row"><span class="prog-label">Long Ans</span><div class="prog-track"><div class="prog-fill" style="width:12%;background:var(--amber)"></div></div><span class="prog-val" style="color:var(--amber)">12%</span></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Assign Set to Exam</div></div><div class="card-bd">
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Exam</label><select class="form-input"><option>Mid-Term Physics</option><option>Calculus Final</option></select></div>
+        <div class="form-group" style="margin-bottom:12px"><label class="form-label">Question Set</label><select class="form-input"><option>QS-Physics-2025-A</option><option>QS-Math-2025</option></select></div>
+        <button class="btn btn-primary" style="width:100%" onclick="toast('✅','Question set assigned!')">Assign Set</button>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROCTORING ══ -->
+<div class="page" id="pg-proctor">
+  <div class="page-hd"><div><div class="page-title">Proctoring Centre</div><div class="page-sub">Monitor live exams — detect and act on violations</div></div></div>
+  <div class="stats-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+    <div class="stat" style="cursor:default"><div class="stat-stripe" style="background:var(--green)"></div><div class="stat-hd"><div class="stat-icon" style="background:var(--green-lt);color:var(--green)"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div></div><div class="stat-val" style="color:var(--green);font-size:22px">241</div><div class="stat-lbl">Online Now</div></div>
+    <div class="stat" style="cursor:default"><div class="stat-stripe" style="background:var(--red)"></div><div class="stat-hd"><div class="stat-icon" style="background:var(--red-lt);color:var(--red)"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div></div><div class="stat-val" style="color:var(--red);font-size:22px">3</div><div class="stat-lbl">Flagged</div></div>
+    <div class="stat" style="cursor:default"><div class="stat-stripe" style="background:var(--amber)"></div><div class="stat-hd"><div class="stat-icon" style="background:var(--amber-lt);color:var(--amber)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="stat-val" style="color:var(--amber);font-size:22px">14</div><div class="stat-lbl">Absent</div></div>
+    <div class="stat" style="cursor:default"><div class="stat-stripe" style="background:var(--blue)"></div><div class="stat-hd"><div class="stat-icon" style="background:var(--blue-lt);color:var(--blue)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="stat-val" style="color:var(--blue);font-size:22px">187</div><div class="stat-lbl">Submitted</div></div>
+  </div>
+  <div class="alert a-err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><div><strong>Arjun Mehta</strong> — Tab switched 3 times during Calculus Final. <button class="btn btn-danger btn-sm" style="margin-left:8px" onclick="toast('⛔','Arjun Mehta terminated from exam.')">Terminate Exam</button></div></div>
+  <div class="card"><div class="card-hd"><div class="card-title">Live Candidate Monitor</div><div class="card-sub">Real-time SEB session tracking</div></div><div class="card-bd" style="padding-top:10px"><div class="tbl-wrap"><table><thead><tr><th>Candidate</th><th>Exam</th><th>Progress</th><th>Tab Switches</th><th>SEB Lock</th><th>Status</th><th>Action</th></tr></thead><tbody id="proc-tbl"></tbody></table></div></div></div>
+</div>
+
+<!-- ══ CUT-OFF ══ -->
+<div class="page" id="pg-cutoff">
+  <div class="page-hd"><div><div class="page-title">Cut-off &amp; Grading</div><div class="page-sub">Configure pass marks, grade thresholds and cut-off scores</div></div></div>
+  <div class="g2">
+    <div class="card"><div class="card-hd"><div class="card-title">Exam Cut-off Settings</div></div><div class="card-bd"><div class="form-grid">
+      <div class="form-group"><label class="form-label">Select Exam</label><select class="form-input"><option>Mid-Term Physics</option><option>Calculus Final</option></select></div>
+      <div class="form-group"><label class="form-label">Total Marks</label><input class="form-input" value="100" type="number"></div>
+      <div class="form-group"><label class="form-label">Cut-off (Pass)</label><input class="form-input" value="40" type="number"></div>
+      <div class="form-group"><label class="form-label">Distinction</label><input class="form-input" value="80" type="number"></div>
+      <div class="form-group"><label class="form-label">Grade A</label><input class="form-input" value="70" type="number"></div>
+      <div class="form-group"><label class="form-label">Grade B</label><input class="form-input" value="55" type="number"></div>
+      <div class="form-group"><label class="form-label">Grade C</label><input class="form-input" value="40" type="number"></div>
+      <div class="form-group"><label class="form-label">Chain Sequence</label><input class="form-input" value="30 / 270"></div>
+      <div class="fg-actions"><button class="btn btn-outline">Reset</button><button class="btn btn-primary" onclick="toast('✅','Cut-off settings saved!')">Save Settings</button></div>
+    </div></div></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card"><div class="card-hd"><div class="card-title">Grade Summary</div><div class="card-sub">Calculus Final</div></div><div class="card-bd">
+        <div class="prog-row"><span class="prog-label">Distinction</span><div class="prog-track"><div class="prog-fill" style="width:18%;background:var(--purple)"></div></div><span class="prog-val" style="color:var(--purple)">18%</span></div>
+        <div class="prog-row"><span class="prog-label">Grade A</span><div class="prog-track"><div class="prog-fill" style="width:28%;background:var(--blue)"></div></div><span class="prog-val" style="color:var(--blue)">28%</span></div>
+        <div class="prog-row"><span class="prog-label">Grade B</span><div class="prog-track"><div class="prog-fill" style="width:28%;background:var(--green)"></div></div><span class="prog-val" style="color:var(--green)">28%</span></div>
+        <div class="prog-row"><span class="prog-label">Grade C</span><div class="prog-track"><div class="prog-fill" style="width:15%;background:var(--amber)"></div></div><span class="prog-val" style="color:var(--amber)">15%</span></div>
+        <div class="prog-row"><span class="prog-label">Fail</span><div class="prog-track"><div class="prog-fill" style="width:11%;background:var(--red)"></div></div><span class="prog-val" style="color:var(--red)">11%</span></div>
+      </div></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Subjective Marking</div></div><div class="card-bd">
+        <div class="alert a-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div>12 long-answer responses awaiting manual marking</div></div>
+        <button class="btn btn-primary" style="width:100%" onclick="toast('📝','Marking panel ready in full system')">Open Marking Panel</button>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ USERS ══ -->
+<div class="page" id="pg-users">
+  <div class="page-hd"><div><div class="page-title">User IDs &amp; Access</div><div class="page-sub">Manage login credentials for students</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="toast('📤','Credentials exported!')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+      <button class="btn btn-primary" onclick="toast('🔑','Bulk passwords reset!')"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Reset All</button>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-hd"><div class="card-title">Student Credentials</div></div><div class="card-bd" style="padding-top:10px"><div class="tbl-wrap"><table><thead><tr><th>Name</th><th>User ID</th><th>Password</th><th>Last Login</th><th>Access</th></tr></thead><tbody id="cred-tbl"></tbody></table></div></div></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card"><div class="card-hd"><div class="card-title">Add Invigilator</div></div><div class="card-bd">
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Full Name</label><input class="form-input" placeholder="Invigilator name"></div>
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="email@school.in"></div>
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Assign Hall</label><select class="form-input"><option>Hall A</option><option>Hall B</option><option>Hall C</option><option>Online</option></select></div>
+        <div class="form-group" style="margin-bottom:12px"><label class="form-label">Assign Exam</label><select class="form-input"><option>Mid-Term Physics</option><option>Calculus Final</option></select></div>
+        <button class="btn btn-primary" style="width:100%" onclick="toast('✅','Invigilator added & credentials sent!')">Add Invigilator</button>
+      </div></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Reset Password</div></div><div class="card-bd">
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Student ID</label><input class="form-input" placeholder="STU2025001"></div>
+        <div class="form-group" style="margin-bottom:12px"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="New password"></div>
+        <button class="btn btn-outline" style="width:100%" onclick="toast('🔑','Password reset successfully!')">Reset Password</button>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTICES ══ -->
+<div class="page" id="pg-notices">
+  <div class="page-hd"><div><div class="page-title">Notices &amp; Email</div><div class="page-sub">Send announcements to students</div></div><button class="btn btn-primary" onclick="openM('m-notice')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>New Notice</button></div>
+  <div class="g2">
+    <div class="card"><div class="card-hd"><div class="card-title">Compose Notice</div></div><div class="card-bd">
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Send To</label><select class="form-input"><option>All Students</option><option>Specific Exam Group</option><option>All Admins</option></select></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Channel</label><div style="display:flex;gap:18px;margin-top:6px"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:500"><input type="checkbox" checked>Email</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:500"><input type="checkbox" checked>Portal</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:500"><input type="checkbox">SMS</label></div></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Subject</label><input class="form-input" placeholder="Notice subject…"></div>
+      <div class="form-group" style="margin-bottom:14px"><label class="form-label">Message</label><textarea class="form-input" rows="5" placeholder="Type your notice here…"></textarea></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-outline" onclick="toast('📅','Notice scheduled!')">Schedule</button><button class="btn btn-primary" onclick="toast('✅','Notice sent to all students!')">Send Now</button></div>
+    </div></div>
+    <div class="card"><div class="card-hd"><div class="card-title">Notice History</div></div><div class="card-bd" id="notice-hist"></div></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="page" id="pg-settings">
+  <div class="page-hd"><div><div class="page-title">Settings</div><div class="page-sub">Configure portal behaviour and system preferences</div></div></div>
+  <div class="g2">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card"><div class="card-hd"><div class="card-title">Portal Settings</div></div><div class="card-bd">
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13.5px;font-weight:700;color:var(--text)">SEB Lock Mode</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Force Safe Exam Browser for all exams</div></div><label class="toggle"><input type="checkbox" checked><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13.5px;font-weight:700;color:var(--text)">Auto Proctoring</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Enable face &amp; tab-switch detection</div></div><label class="toggle"><input type="checkbox" checked><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13.5px;font-weight:700;color:var(--text)">Auto-publish Results</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Publish MCQ results automatically after exam</div></div><label class="toggle"><input type="checkbox"><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0"><div><div style="font-size:13.5px;font-weight:700;color:var(--text)">Email Notifications</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Send result emails to students</div></div><label class="toggle"><input type="checkbox" checked><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:6px" onclick="toast('✅','Settings saved!')">Save Changes</button>
+      </div></div>
+      <div class="card"><div class="card-hd"><div class="card-title">Institution Info</div></div><div class="card-bd">
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Institution Name</label><input class="form-input" value="Mysuru Institute of Technology"></div>
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Admin Email</label><input class="form-input" value="admin@sebportal.in"></div>
+        <div class="form-group" style="margin-bottom:14px"><label class="form-label">Portal URL</label><input class="form-input" value="https://exam.sebportal.in"></div>
+        <button class="btn btn-primary" onclick="toast('✅','Institution info updated!')">Update Info</button>
+      </div></div>
+    </div>
+    <div class="card"><div class="card-hd"><div class="card-title">Content Delivery Engine</div><div class="card-sub">CDE system config — from your blueprint</div></div><div class="card-bd">
+      <div class="info-row"><span class="info-label">Engine Status</span><span class="info-val" style="color:var(--green)">● Active</span></div>
+      <div class="info-row"><span class="info-label">QB Sync Status</span><span class="info-val" style="color:var(--green)">✓ Synced</span></div>
+      <div class="info-row"><span class="info-label">Candidate Bounding</span><span class="info-val" style="color:var(--green)">● Active</span></div>
+      <div class="info-row"><span class="info-label">Exam Engine Version</span><span class="info-val">v2.0</span></div>
+      <div class="info-row"><span class="info-label">Login Feature</span><span class="info-val">Core 2.0</span></div>
+      <div class="info-row"><span class="info-label">Scratch Pad</span><span class="info-val">0 – 8</span></div>
+      <div class="info-row"><span class="info-label">Load Balancer</span><span class="info-val">3 Nodes</span></div>
+      <div class="info-row"><span class="info-label">Chain Sequence</span><span class="info-val">30 / 270</span></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-outline" onclick="toast('🔄','CDE restarted!')">Restart CDE</button>
+        <button class="btn btn-success" onclick="toast('✅','Config saved!')">Save Config</button>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+/* ── DATA ── */
+const EXAMS=[
+  {id:'E001',title:'Mid-Term Physics',sub:'Physics',date:'2025-04-11',dur:150,students:142,cutoff:40,status:'Live',proctor:true},
+  {id:'E002',title:'Calculus Final',sub:'Maths',date:'2025-04-11',dur:180,students:98,cutoff:40,status:'Live',proctor:true},
+  {id:'E003',title:'English Literature',sub:'English',date:'2025-04-11',dur:120,students:203,cutoff:35,status:'Live',proctor:false},
+  {id:'E004',title:'Organic Chemistry',sub:'Chemistry',date:'2025-04-14',dur:150,students:176,cutoff:40,status:'Upcoming',proctor:true},
+  {id:'E005',title:'World History',sub:'History',date:'2025-04-10',dur:90,students:115,cutoff:40,status:'Ended',proctor:false},
+  {id:'E006',title:'Data Structures',sub:'CS',date:'2025-04-09',dur:180,students:89,cutoff:40,status:'Graded',proctor:true},
+  {id:'E007',title:'Biology Semester',sub:'Biology',date:'2025-04-15',dur:150,students:156,cutoff:40,status:'Upcoming',proctor:true},
+  {id:'E008',title:'Advanced Maths',sub:'Maths',date:'2025-04-16',dur:180,students:78,cutoff:40,status:'Upcoming',proctor:true},
+];
+const STUDENTS=[
+  {id:'STU2025001',name:'Ananya Singh',dept:'CS',sem:'4th',exams:3,enabled:true,flagged:false},
+  {id:'STU2025002',name:'Rahul Verma',dept:'Physics',sem:'3rd',exams:2,enabled:true,flagged:false},
+  {id:'STU2025003',name:'Meera Pillai',dept:'Maths',sem:'5th',exams:4,enabled:true,flagged:false},
+  {id:'STU2025004',name:'Arjun Mehta',dept:'CS',sem:'4th',exams:2,enabled:true,flagged:true},
+  {id:'STU2025005',name:'Divya Rao',dept:'Biology',sem:'2nd',exams:2,enabled:false,flagged:false},
+  {id:'STU2025006',name:'Sai Krishna',dept:'Chemistry',sem:'3rd',exams:3,enabled:true,flagged:false},
+  {id:'STU2025007',name:'Priya Nair',dept:'CS',sem:'4th',exams:3,enabled:true,flagged:true},
+  {id:'STU2025008',name:'Karthik M.',dept:'English',sem:'5th',exams:2,enabled:true,flagged:true},
+];
+const RESULTS=[
+  {name:'Ananya Singh',exam:'Data Structures',marks:88,total:100,grade:'A'},
+  {name:'Rahul Verma',exam:'Calculus Final',marks:72,total:100,grade:'B+'},
+  {name:'Meera Pillai',exam:'World History',marks:91,total:100,grade:'A+'},
+  {name:'Sai Krishna',exam:'Organic Chem',marks:58,total:100,grade:'C'},
+  {name:'Divya Rao',exam:'Physics Mid-Term',marks:34,total:100,grade:'F'},
+  {name:'Karthik M.',exam:'English Lit',marks:79,total:100,grade:'B+'},
+  {name:'Priya Nair',exam:'Data Structures',marks:94,total:100,grade:'A+'},
+  {name:'Arjun Mehta',exam:'Data Structures',marks:61,total:100,grade:'B'},
+];
+const QB=[
+  {n:1,topic:'Kinematics',type:'MCQ',diff:'Medium',marks:2,set:'QS-Physics-2025-A'},
+  {n:2,topic:'Integration',type:'MCQ',diff:'Hard',marks:3,set:'QS-Math-2025'},
+  {n:3,topic:'Organic Reactions',type:'Short Ans',diff:'Hard',marks:5,set:'QS-Chem-2025'},
+  {n:4,topic:'Grammar Rules',type:'MCQ',diff:'Easy',marks:1,set:'QS-English-2025'},
+  {n:5,topic:'Arrays & Linked Lists',type:'MCQ',diff:'Medium',marks:2,set:'QS-CS-2025'},
+  {n:6,topic:'Thermodynamics',type:'Long Ans',diff:'Hard',marks:8,set:'QS-Physics-2025-B'},
+];
+const PROCTOR=[
+  {name:'Ananya Singh',exam:'Physics',prog:65,tabs:0,seb:true,status:'OK'},
+  {name:'Arjun Mehta',exam:'Calculus Final',prog:48,tabs:3,seb:true,status:'Flagged'},
+  {name:'Priya Nair',exam:'Data Structures',prog:72,tabs:1,seb:true,status:'Flagged'},
+  {name:'Sai Krishna',exam:'Physics',prog:55,tabs:0,seb:true,status:'OK'},
+  {name:'Sneha Iyer',exam:'English Lit',prog:30,tabs:2,seb:false,status:'Flagged'},
+  {name:'Rahul Verma',exam:'Calculus Final',prog:90,tabs:0,seb:true,status:'OK'},
+];
+
+/* ── HELPERS ── */
+const subColors={Physics:'#7c3aed',Maths:'#0891b2',English:'#d97706',Chemistry:'#059669',History:'#dc2626',CS:'#1a56db',Biology:'#d97706'};
+const subBg={Physics:'#f5f3ff',Maths:'#ecfeff',English:'#fffbeb',Chemistry:'#ecfdf5',History:'#fef2f2',CS:'#eff6ff',Biology:'#fffbeb'};
+const stPill={'Live':'<span class="pill p-live"><span class="pill-dot"></span>Live</span>','Upcoming':'<span class="pill p-upcoming"><span class="pill-dot"></span>Upcoming</span>','Ended':'<span class="pill p-ended"><span class="pill-dot"></span>Ended</span>','Graded':'<span class="pill p-graded"><span class="pill-dot"></span>Graded</span>','Flagged':'<span class="pill p-flagged"><span class="pill-dot"></span>Flagged</span>'};
+const diffColor={Easy:'#059669',Medium:'#d97706',Hard:'#dc2626'};
+const gradeColor={'A+':'#7c3aed','A':'#1a56db','B+':'#059669','B':'#059669','C':'#d97706','F':'#dc2626'};
+function sTag(s){return`<span class="s-tag" style="background:${subBg[s]||'#f3f4f6'};color:${subColors[s]||'#374151'}">${s}</span>`}
+function scoreBar(pct){const c=pct>=60?'var(--green)':pct>=40?'var(--amber)':'var(--red)';return`<div class="score-row"><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${c}"></div></div><span class="score-val" style="color:${c}">${pct}%</span></div>`}
+
+/* ── RENDERS ── */
+function renderDashTbl(){
+  document.getElementById('dash-tbl').innerHTML=EXAMS.slice(0,5).map(e=>`<tr>
+    <td style="font-weight:700;font-size:13px">${e.title}</td>
+    <td style="color:var(--text2)">${e.students}</td>
+    <td>${stPill[e.status]||''}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:12px">${e.cutoff}/100</td>
+    <td><button class="btn btn-outline btn-sm" onclick="toast('🔒','${e.title} action triggered!')">${e.status==='Live'?'End Exam':'Control'}</button></td>
+  </tr>`).join('');
+}
+function renderExamTbl(data){
+  (document.getElementById('exam-tbl')).innerHTML=(data||EXAMS).map(e=>`<tr>
+    <td style="font-weight:700;font-size:13px">${e.title}</td>
+    <td>${sTag(e.sub)}</td>
+    <td style="font-size:12px;color:var(--text2)">${e.date}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:12px">${e.dur}m</td>
+    <td style="color:var(--text2)">${e.students}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:12px">${e.cutoff}</td>
+    <td>${stPill[e.status]||''}</td>
+    <td><span style="font-size:12px;font-weight:700;color:${e.proctor?'var(--green)':'var(--text3)'}">${e.proctor?'✓ On':'Off'}</span></td>
+    <td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm" onclick="toast('✏️','Editing ${e.title}')">Edit</button><button class="btn btn-danger btn-sm" onclick="toast('🗑️','${e.title} deleted!')">Del</button></div></td>
+  </tr>`).join('');
+}
+function renderStudents(data){
+  document.getElementById('stud-tbl').innerHTML=(data||STUDENTS).map(s=>`<tr>
+    <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">${s.id}</td>
+    <td style="font-weight:700;font-size:13px">${s.name}${s.flagged?'<span class="pill p-flagged" style="margin-left:6px;font-size:9.5px">⚑ Flagged</span>':''}</td>
+    <td style="color:var(--text2)">${s.dept}</td>
+    <td style="color:var(--text2)">${s.sem}</td>
+    <td style="font-family:'DM Mono',monospace">${s.exams}</td>
+    <td>${s.enabled?'<span class="pill p-on"><span class="pill-dot"></span>Enabled</span>':'<span class="pill p-off"><span class="pill-dot"></span>Disabled</span>'}</td>
+    <td><label class="toggle"><input type="checkbox" ${s.enabled?'checked':''} onchange="toast(this.checked?'✅':'⛔','Access updated for ${s.name}')"><span class="tog-track"></span><span class="tog-thumb"></span></label></td>
+    <td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm" onclick="toast('🔑','Password reset for ${s.name}!')">Reset</button><button class="btn btn-danger btn-sm" onclick="toast('⛔','${s.name} removed!')">Remove</button></div></td>
+  </tr>`).join('');
+}
+function renderResults(f){
+  let d=RESULTS;
+  if(f==='pass')d=RESULTS.filter(r=>r.marks>=40);
+  if(f==='fail')d=RESULTS.filter(r=>r.marks<40);
+  document.getElementById('res-tbl').innerHTML=d.map(r=>{const pct=Math.round(r.marks/r.total*100);return`<tr>
+    <td style="font-weight:700;font-size:13px">${r.name}</td>
+    <td style="color:var(--text2);font-size:12.5px">${r.exam}</td>
+    <td style="font-family:'DM Mono',monospace">${r.marks}/${r.total}</td>
+    <td style="min-width:120px">${scoreBar(pct)}</td>
+    <td style="font-weight:800;font-size:14px;color:${gradeColor[r.grade]||'var(--text)'}">${r.grade}</td>
+    <td>${r.marks>=40?'<span class="pill p-on"><span class="pill-dot"></span>Passed</span>':'<span class="pill p-off"><span class="pill-dot"></span>Failed</span>'}</td>
+  </tr>`}).join('');
+}
+function renderQB(){
+  document.getElementById('qb-tbl').innerHTML=QB.map(q=>`<tr>
+    <td style="font-family:'DM Mono',monospace;color:var(--text3)">${q.n}</td>
+    <td style="font-weight:700;font-size:13px">${q.topic}</td>
+    <td style="color:var(--text2);font-size:12px">${q.type}</td>
+    <td><span style="font-size:12px;font-weight:700;color:${diffColor[q.diff]}">${q.diff}</span></td>
+    <td style="font-family:'DM Mono',monospace">${q.marks}</td>
+    <td style="font-size:11px;color:var(--primary);font-weight:600">${q.set}</td>
+    <td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm" onclick="toast('✏️','Editing question')">Edit</button><button class="btn btn-danger btn-sm" onclick="toast('🗑️','Question deleted!')">Del</button></div></td>
+  </tr>`).join('');
+}
+function renderProctor(){
+  document.getElementById('proc-tbl').innerHTML=PROCTOR.map(p=>`<tr>
+    <td style="font-weight:700;font-size:13px">${p.name}</td>
+    <td style="color:var(--text2);font-size:12px">${p.exam}</td>
+    <td style="min-width:100px">${scoreBar(p.prog)}</td>
+    <td style="font-family:'DM Mono',monospace;font-weight:700;color:${p.tabs>0?'var(--red)':'var(--green)'}">${p.tabs}</td>
+    <td><span style="font-size:12.5px;font-weight:700;color:${p.seb?'var(--green)':'var(--red)'}">${p.seb?'✓ Active':'✗ Off'}</span></td>
+    <td>${stPill[p.status]||'<span class="pill p-on">OK</span>'}</td>
+    <td><div style="display:flex;gap:4px">${p.status==='Flagged'?`<button class="btn btn-danger btn-sm" onclick="toast('⛔','${p.name} terminated!')">Terminate</button>`:''}
+    <button class="btn btn-outline btn-sm" onclick="toast('💬','Warning sent to ${p.name}!')">Warn</button></div></td>
+  </tr>`).join('');
+}
+function renderCreds(){
+  document.getElementById('cred-tbl').innerHTML=STUDENTS.slice(0,6).map(s=>`<tr>
+    <td style="font-weight:700;font-size:13px">${s.name}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${s.id}</td>
+    <td style="font-family:'DM Mono',monospace;color:var(--text3)">••••••••</td>
+    <td style="color:var(--text3);font-size:12px">Today 9:42 AM</td>
+    <td>${s.enabled?'<span class="pill p-on"><span class="pill-dot"></span>Active</span>':'<span class="pill p-off"><span class="pill-dot"></span>Disabled</span>'}</td>
+  </tr>`).join('');
+}
+function renderFeed(){
+  const feed=[
+    {bg:'var(--purple-lt)',ic:'#7c3aed',svg:'<polyline points="20 6 9 17 4 12"/>',txt:'<strong>Ananya Singh</strong> submitted Physics exam',t:'Just now'},
+    {bg:'var(--red-lt)',ic:'var(--red)',svg:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>',txt:'<strong>Arjun Mehta</strong> flagged — browser switch',t:'2 min ago'},
+    {bg:'var(--green-lt)',ic:'var(--green)',svg:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',txt:'<strong>Priya Nair</strong> joined Data Structures',t:'7 min ago'},
+    {bg:'var(--blue-lt)',ic:'var(--blue)',svg:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',txt:'<strong>English Lit</strong> exam started — 203 students',t:'12 min ago'},
+    {bg:'var(--amber-lt)',ic:'var(--amber)',svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',txt:'<strong>42 students</strong> registered for Biology Sem',t:'28 min ago'},
+  ];
+  document.getElementById('dash-feed').innerHTML=feed.map(f=>`<div class="feed-item"><div class="feed-icon" style="background:${f.bg}"><svg viewBox="0 0 24 24" fill="none" stroke="${f.ic}" stroke-width="2">${f.svg}</svg></div><div><div class="feed-main">${f.txt}</div><div class="feed-time">${f.t}</div></div></div>`).join('');
+}
+function renderSubjProg(){
+  const d=[{s:'Physics',v:78,c:'var(--purple)'},{s:'Maths',v:72,c:'var(--teal)'},{s:'Chemistry',v:65,c:'var(--green)'},{s:'English',v:84,c:'var(--amber)'},{s:'CS',v:80,c:'var(--blue)'},{s:'Biology',v:70,c:'#d97706'}];
+  document.getElementById('subj-prog').innerHTML=d.map(x=>`<div class="prog-row"><span class="prog-label">${x.s}</span><div class="prog-track"><div class="prog-fill" style="width:${x.v}%;background:${x.c}"></div></div><span class="prog-val" style="color:${x.c}">${x.v}%</span></div>`).join('');
+}
+function renderUpcoming(){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('upcoming-list').innerHTML=EXAMS.filter(e=>e.status==='Upcoming').map(e=>{const p=e.date.split('-');return`<div class="exam-row-item"><div class="exam-date"><div class="exam-day">${p[2]}</div><div class="exam-mon">${months[+p[1]-1]}</div></div><div style="flex:1;min-width:0"><div class="exam-name">${e.title}</div><div class="exam-meta">${e.students} students · ${e.dur} min</div></div></div>`}).join('');
+}
+function renderNoticeHist(){
+  const n=[{t:'Exam Hall Change',m:'Physics exam moved to Hall A',time:'2h ago',ch:'Email'},{t:'Result Published',m:'Data Structures results are live',time:'5h ago',ch:'Portal'},{t:'Schedule Update',m:'Biology exam rescheduled to 15th',time:'1d ago',ch:'Both'}];
+  document.getElementById('notice-hist').innerHTML=n.map(x=>`<div style="padding:11px 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:13px;font-weight:700;color:var(--text)">${x.t}</span><span style="font-size:11px;color:var(--text3)">${x.time}</span></div><div style="font-size:12.5px;color:var(--text2)">${x.m}</div><span style="font-size:11px;color:var(--primary);font-weight:600;margin-top:3px;display:inline-block">📤 ${x.ch}</span></div>`).join('');
+}
+
+/* ── CHART ── */
+Chart.defaults.color='#6b7280';Chart.defaults.borderColor='rgba(0,0,0,0.06)';Chart.defaults.font.family="'DM Sans',sans-serif";Chart.defaults.font.size=12;
+const chartData={week:[78,72,84,65,74,80,70],month:[74,68,80,62,71,76,68]};
+let barChart;
+function initChart(){
+  const ctx=document.getElementById('barChart').getContext('2d');
+  barChart=new Chart(ctx,{type:'bar',data:{labels:['Physics','Maths','English','Chem','History','CS','Biology'],datasets:[{data:chartData.week,backgroundColor:v=>v.raw>=80?'rgba(5,150,105,0.7)':v.raw>=65?'rgba(26,86,219,0.7)':'rgba(220,38,38,0.6)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' Avg Score: '+c.raw+'%'}}},scales:{x:{grid:{display:false},border:{display:false}},y:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}}}}});
+}
+window.switchChart=function(k,btn){
+  document.querySelectorAll('#pg-dash .tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
+  barChart.data.datasets[0].data=chartData[k];barChart.update();
+};
+
+/* ── NAV ── */
+const titles={'pg-dash':'Dashboard','pg-exams':'Exam Manager','pg-students':'Students','pg-results':'Results','pg-qb':'Question Bank','pg-proctor':'Proctoring','pg-cutoff':'Cut-off & Grading','pg-users':'User IDs & Access','pg-notices':'Notices & Email','pg-settings':'Settings'};
+window.nav=function(el,id){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById(id);if(pg)pg.classList.add('active');
+  document.getElementById('tb-title').textContent=titles[id]||id;
+  if(window.innerWidth<=800)closeSb();
+};
+
+/* ── SIDEBAR ── */
+window.toggleSb=function(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-ov').classList.toggle('open')};
+window.closeSb=function(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-ov').classList.remove('open')};
+
+/* ── MODALS ── */
+window.openM=function(id){document.getElementById(id).classList.add('open')};
+window.closeM=function(id){document.getElementById(id).classList.remove('open')};
+
+/* ── TOAST ── */
+let tTmr;
+window.toast=function(ico,msg){document.getElementById('toast-ico').textContent=ico;document.getElementById('toast-msg').textContent=msg;document.getElementById('toast').style.display='block';clearTimeout(tTmr);tTmr=setTimeout(()=>document.getElementById('toast').style.display='none',3000)};
+
+/* ── FILTERS ── */
+window.filterExams=function(q){renderExamTbl(EXAMS.filter(e=>e.title.toLowerCase().includes(q.toLowerCase())))};
+window.filterExamSt=function(s){renderExamTbl(s?EXAMS.filter(e=>e.status===s):null)};
+window.filterStudents=function(q){renderStudents(STUDENTS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.id.toLowerCase().includes(q.toLowerCase())))};
+window.filterStudSt=function(s){renderStudents(s?STUDENTS.filter(st=>s==='Flagged'?st.flagged:s==='Enabled'?st.enabled:!st.enabled):null)};
+window.switchRes=function(btn,f){document.querySelectorAll('#res-tabs .tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderResults(f)};
+
+/* ── SESSION INFO ── */
+(function(){
+  const s=localStorage.getItem('seb_admin_session');
+  if(!s)return;
+  try{
+    const sess=JSON.parse(s);
+    const n=document.getElementById('sb-name'),r=document.getElementById('sb-role'),a=document.getElementById('sb-av'),sn=document.getElementById('sess-name');
+    if(n)n.textContent=sess.name||'Admin';
+    if(r)r.textContent=sess.uid||'admin@sebportal.in';
+    if(a)a.textContent=(sess.name||'AD').substring(0,2).toUpperCase();
+    if(sn)sn.textContent=sess.name||'Admin';
+    const st=document.getElementById('sess-timer');
+    function tick(){const diff=Math.floor((Date.now()-new Date(sess.loginTime).getTime())/1000);const m=Math.floor(diff/60),sc=diff%60;if(st)st.textContent=String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0');}
+    tick();setInterval(tick,1000);
+  }catch(e){}
+})();
+
+/* ── DATE ── */
+document.getElementById('tb-date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+/* ── LIVE TICKER ── */
+let on=241,sub=187;
+setInterval(()=>{
+  on=Math.max(220,Math.min(260,on+(Math.random()>.5?1:-1)));
+  sub=Math.min(on,sub+(Math.random()>.4?1:0));
+  const oe=document.getElementById('lv-on'),se=document.getElementById('lv-sub');
+  if(oe)oe.textContent=Math.round(on);if(se)se.textContent=Math.round(sub);
+},4000);
+
+/* ── COUNT UP ── */
+function countUp(el,target){let c=0;const step=Math.ceil(target/40);const t=setInterval(()=>{c=Math.min(c+step,target);el.textContent=c.toLocaleString();if(c>=target)clearInterval(t);},25);}
+
+/* ── INIT ── */
+renderDashTbl();renderFeed();renderSubjProg();renderUpcoming();
+renderExamTbl();renderStudents();renderResults('all');renderQB();renderProctor();renderCreds();renderNoticeHist();
+setTimeout(()=>{
+  initChart();
+  const se=document.getElementById('s-students'),qe=document.getElementById('s-exams'),qb=document.getElementById('s-qb');
+  if(se)countUp(se,2847);if(qe)countUp(qe,38);if(qb)countUp(qb,1204);
+},150);
+</script>
+</body>
+</html>
