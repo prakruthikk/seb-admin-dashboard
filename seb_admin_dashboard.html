@@ -280,6 +280,12 @@ select.form-input option{background:#fff}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
 
+/* ══════════════ QB FILE DROP ZONE ══════════════ */
+#qbu-drop-zone:hover{border-color:var(--primary)!important;background:var(--primary-lt)!important}
+
+/* ══════════════ ADMIT CARD PRINT ══════════════ */
+@media print{.sidebar,.topbar,.tb-btn{display:none!important}}
+
 /* ══════════════ RESPONSIVE ══════════════ */
 @media(max-width:1100px){
   .stats-row{grid-template-columns:1fr 1fr}
@@ -333,6 +339,134 @@ window.doLogout = function(){
   }
 };
 </script>
+
+<!-- MODAL: QB File Upload -->
+<div class="modal-bg" id="m-qb-upload">
+  <div class="modal" style="width:min(560px,100%)">
+    <div class="modal-hd"><div class="modal-title">Upload Question Bank File</div><button class="modal-close" onclick="closeM('m-qb-upload')">×</button></div>
+    <div class="modal-bd">
+      <div class="alert a-info" style="margin-bottom:14px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div>Supported formats: PDF, DOCX, DOC, XLSX, XLS, CSV, TXT, JSON, ZIP, and more. Files will appear in both Exam Manager and Question Bank.</div></div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">Subject / Category</label><select class="form-input" id="qbu-subject"><option>Physics</option><option>Mathematics</option><option>Chemistry</option><option>English</option><option>Computer Science</option><option>Biology</option><option>General</option></select></div>
+      <div class="form-group" style="margin-bottom:12px"><label class="form-label">Question Set Tag</label><input class="form-input" id="qbu-tag" placeholder="e.g. QS-Physics-2025-A"></div>
+      <div id="qbu-drop-zone" style="border:2px dashed var(--border2);border-radius:var(--r);padding:36px 20px;text-align:center;background:var(--surface);cursor:pointer;transition:all .2s;margin-bottom:14px"
+        ondragover="event.preventDefault();this.style.borderColor='var(--primary)';this.style.background='var(--primary-lt)'"
+        ondragleave="this.style.borderColor='var(--border2)';this.style.background='var(--surface)'"
+        ondrop="handleQBDrop(event)" onclick="document.getElementById('qbu-file-inp').click()">
+        <div style="font-size:32px;margin-bottom:8px">📁</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Drop files here or click to browse</div>
+        <div style="font-size:12px;color:var(--text3)">PDF, DOCX, XLSX, CSV, TXT, JSON, ZIP — any format accepted</div>
+        <input type="file" id="qbu-file-inp" multiple accept="*/*" style="display:none" onchange="handleQBFileSelect(this.files)">
+      </div>
+      <div id="qbu-file-list" style="margin-bottom:14px"></div>
+      <div class="fg-actions">
+        <button class="btn btn-outline" onclick="closeM('m-qb-upload')">Cancel</button>
+        <button class="btn btn-primary" onclick="commitQBUpload()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload to Question Bank</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: View QB File -->
+<div class="modal-bg" id="m-qb-view">
+  <div class="modal" style="width:min(600px,100%)">
+    <div class="modal-hd"><div class="modal-title" id="qbv-title">View File</div><button class="modal-close" onclick="closeM('m-qb-view')">×</button></div>
+    <div class="modal-bd">
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:16px;margin-bottom:14px">
+        <div id="qbv-details"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="closeM('m-qb-view')">Close</button>
+        <button class="btn btn-primary" id="qbv-assign-btn" onclick="toast('✅','File assigned to exam!');closeM('m-qb-view')">Assign to Exam</button>
+        <button class="btn btn-danger" id="qbv-delete-btn">Delete File</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Admit Card Generator (Bulk) -->
+<div class="modal-bg" id="m-admit-bulk">
+  <div class="modal" style="width:min(600px,100%)">
+    <div class="modal-hd"><div class="modal-title">🎫 Admit Card Generator</div><button class="modal-close" onclick="closeM('m-admit-bulk')">×</button></div>
+    <div class="modal-bd">
+      <div class="tab-bar" style="margin-bottom:16px">
+        <button class="tab active" id="admit-tab-bulk" onclick="switchAdmitTab('bulk',this)">Bulk — All Students</button>
+        <button class="tab" id="admit-tab-ind" onclick="switchAdmitTab('individual',this)">Individual</button>
+        <button class="tab" id="admit-tab-preview" onclick="switchAdmitTab('preview',this)">Preview Card</button>
+      </div>
+
+      <!-- Bulk Tab -->
+      <div id="admit-bulk-section">
+        <div class="form-grid" style="margin-bottom:14px">
+          <div class="form-group"><label class="form-label">Select Exam</label><select class="form-input" id="admit-exam"><option>Mid-Term Physics</option><option>Calculus Final</option><option>English Literature</option><option>Organic Chemistry</option><option>Biology Semester</option></select></div>
+          <div class="form-group"><label class="form-label">Exam Hall</label><select class="form-input" id="admit-hall"><option>All Halls</option><option>Hall A</option><option>Hall B</option><option>Hall C</option><option>Online</option></select></div>
+          <div class="form-group"><label class="form-label">Exam Date</label><input class="form-input" type="date" id="admit-date" value="2025-04-20"></div>
+          <div class="form-group"><label class="form-label">Exam Time</label><input class="form-input" type="time" id="admit-time" value="10:00"></div>
+          <div class="form-group fg-full"><label class="form-label">Special Instructions (optional)</label><textarea class="form-input" rows="2" id="admit-instructions" placeholder="Bring valid photo ID. No calculators allowed."></textarea></div>
+        </div>
+        <div style="background:var(--green-lt);border:1.5px solid var(--green-b);border-radius:var(--r-sm);padding:12px;margin-bottom:14px;font-size:13px;color:var(--green);font-weight:600">✅ <strong id="admit-count">443</strong> registered students will receive admit cards</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-outline" onclick="switchAdmitTab('preview',document.getElementById('admit-tab-preview'))">Preview Sample</button>
+          <button class="btn btn-primary" onclick="generateBulkAdmitCards()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Generate &amp; Download All</button>
+        </div>
+      </div>
+
+      <!-- Individual Tab -->
+      <div id="admit-individual-section" style="display:none">
+        <div class="form-grid" style="margin-bottom:14px">
+          <div class="form-group"><label class="form-label">Select Exam</label><select class="form-input" id="admit-ind-exam"><option>Mid-Term Physics</option><option>Calculus Final</option><option>English Literature</option></select></div>
+          <div class="form-group"><label class="form-label">Student</label><select class="form-input" id="admit-ind-student">
+            <option value="STU2025001">STU2025001 — Ananya Singh</option>
+            <option value="STU2025002">STU2025002 — Rahul Verma</option>
+            <option value="STU2025003">STU2025003 — Meera Pillai</option>
+            <option value="STU2025004">STU2025004 — Arjun Mehta</option>
+            <option value="STU2025005">STU2025005 — Divya Rao</option>
+            <option value="STU2025006">STU2025006 — Sai Krishna</option>
+            <option value="STU2025007">STU2025007 — Priya Nair</option>
+            <option value="STU2025008">STU2025008 — Karthik M.</option>
+          </select></div>
+          <div class="form-group"><label class="form-label">Exam Date</label><input class="form-input" type="date" id="admit-ind-date" value="2025-04-20"></div>
+          <div class="form-group"><label class="form-label">Exam Hall</label><select class="form-input" id="admit-ind-hall"><option>Hall A</option><option>Hall B</option><option>Hall C</option><option>Online</option></select></div>
+          <div class="form-group"><label class="form-label">Seat Number</label><input class="form-input" placeholder="e.g. A-24" id="admit-ind-seat"></div>
+          <div class="form-group"><label class="form-label">Exam Time</label><input class="form-input" type="time" id="admit-ind-time" value="10:00"></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-outline" onclick="switchAdmitTab('preview',document.getElementById('admit-tab-preview'))">Preview</button>
+          <button class="btn btn-primary" onclick="generateIndividualAdmitCard()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Generate &amp; Print</button>
+        </div>
+      </div>
+
+      <!-- Preview Tab -->
+      <div id="admit-preview-section" style="display:none">
+        <div id="admit-card-preview" style="border:2px solid var(--border);border-radius:var(--r);padding:20px;background:#fff;font-family:'DM Sans',sans-serif;max-width:480px;margin:0 auto">
+          <div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--primary);padding-bottom:12px;margin-bottom:14px">
+            <div style="width:44px;height:44px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div><div style="font-size:15px;font-weight:800;color:var(--primary)">SEB ExamPortal</div><div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.5px">HALL ADMISSION CARD</div></div>
+            <div style="margin-left:auto;text-align:right"><div style="font-size:10px;color:var(--text3)">Card No.</div><div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--primary)">AC-2025-001</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Student Name</div><div style="font-size:13px;font-weight:700;color:var(--text)">Ananya Singh</div></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Student ID</div><div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)">STU2025001</div></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Exam</div><div style="font-size:13px;font-weight:700;color:var(--text)">Mid-Term Physics</div></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Subject</div><div style="font-size:13px;font-weight:700;color:var(--text)">Physics</div></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Date</div><div style="font-size:13px;font-weight:700;color:var(--text)">20 Apr 2025</div></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Time</div><div style="font-size:13px;font-weight:700;color:var(--text)">10:00 AM</div></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Hall</div><div style="font-size:13px;font-weight:700;color:var(--text)">Hall A</div></div>
+            <div><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.4px;text-transform:uppercase">Seat No.</div><div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--primary)">A-24</div></div>
+          </div>
+          <div style="background:var(--amber-lt);border:1px solid var(--amber-b);border-radius:var(--r-sm);padding:8px 12px;font-size:11px;color:var(--amber);font-weight:600;margin-bottom:10px">⚠️ Bring a valid photo ID. No calculators or mobile phones allowed.</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:10px">
+            <div style="font-size:10px;color:var(--text3)">Generated: <strong>SEB ExamPortal v2.0</strong></div>
+            <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">Valid for exam date only</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:14px;display:flex;gap:8px;justify-content:center">
+          <button class="btn btn-outline" onclick="closeM('m-admit-bulk')">Close</button>
+          <button class="btn btn-primary" onclick="printAdmitCard()">🖨️ Print This Card</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- MODALS -->
 <div class="modal-bg" id="m-exam">
@@ -559,54 +693,64 @@ window.doLogout = function(){
 
 <!-- ══ EXAM MANAGER ══ -->
 <div class="page" id="pg-exams">
-  <div class="page-hd"><div><div class="page-title">Exam Manager</div>
-<!-- Added: Question Bank Upload -->
-<div class="card">
-  <div class="card-hd"><div class="card-title">Question Bank Upload</div></div>
-  <div class="card-bd">
-    <input type="file" id="qbUpload" multiple>
-    <ul id="qbList"></ul>
+  <div class="page-hd"><div><div class="page-title">Exam Manager</div><div class="page-sub">Create, schedule and control all exams</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-outline" onclick="openM('m-qb-upload')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Question Bank</button>
+    <button class="btn btn-outline" onclick="openM('m-admit-bulk')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Admit Cards</button>
+    <button class="btn btn-primary" onclick="openM('m-exam')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Exam</button>
   </div>
-</div>
-
-<!-- Added: Live Attendance -->
-<div class="card">
-  <div class="card-hd"><div class="card-title">Live Attendance</div></div>
-  <div class="card-bd">
-    <div>Registered: <span id="regCount">0</span></div>
-    <div>Present: <span id="preCount">0</span></div>
-    <div>Absent: <span id="absCount">0</span></div>
-    <table><thead><tr><th>ID</th><th>Name</th><th>Status</th></tr></thead>
-    <tbody id="attBody"></tbody></table>
   </div>
-</div>
-<script>
-document.getElementById('qbUpload').addEventListener('change',function(){
-  let list=document.getElementById('qbList');
-  list.innerHTML='';
-  [...this.files].forEach(f=>{
-    let li=document.createElement('li');
-    li.textContent=f.name;
-    list.appendChild(li);
-  });
-});
 
-function loadAttendance(){
- let data=[
-   {id:1,name:'Amit',status:'Present'},
-   {id:2,name:'Riya',status:'Absent'},
-   {id:3,name:'Kiran',status:'Present'}
- ];
- document.getElementById('regCount').textContent=data.length;
- let p=data.filter(x=>x.status=='Present').length;
- document.getElementById('preCount').textContent=p;
- document.getElementById('absCount').textContent=data.length-p;
- document.getElementById('attBody').innerHTML=data.map(d=>`<tr><td>${d.id}</td><td>${d.name}</td><td>${d.status}</td></tr>`).join('');
-}
-setInterval(loadAttendance,3000);
-loadAttendance();
-</script>
-<div class="page-sub">Create, schedule and control all exams</div></div><button class="btn btn-primary" onclick="openM('m-exam')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Exam</button></div>
+  <!-- Live Attendance Banner -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-hd">
+      <div><div class="card-title">🔴 Live Attendance</div><div class="card-sub">Real-time attendance for ongoing exams</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="filter-select" id="att-exam-select" onchange="filterAttByExam(this.value)" style="font-size:12px">
+          <option value="">All Exams</option>
+          <option>Mid-Term Physics</option>
+          <option>Calculus Final</option>
+          <option>English Literature</option>
+        </select>
+        <div class="tb-live"><span class="live-dot"></span>Live</div>
+      </div>
+    </div>
+    <div class="card-bd">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
+        <div style="background:var(--blue-lt);border:1.5px solid var(--blue-b);border-radius:var(--r-sm);padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--blue);font-family:'DM Mono',monospace" id="att-registered">443</div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-top:2px">Registered</div>
+        </div>
+        <div style="background:var(--green-lt);border:1.5px solid var(--green-b);border-radius:var(--r-sm);padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--green);font-family:'DM Mono',monospace" id="att-present">241</div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-top:2px">Present / Attending</div>
+        </div>
+        <div style="background:var(--red-lt);border:1.5px solid var(--red-b);border-radius:var(--r-sm);padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--red);font-family:'DM Mono',monospace" id="att-absent">202</div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-top:2px">Absent / Not Joined</div>
+        </div>
+        <div style="background:var(--amber-lt);border:1.5px solid var(--amber-b);border-radius:var(--r-sm);padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--amber);font-family:'DM Mono',monospace" id="att-pct">54%</div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600;margin-top:2px">Attendance Rate</div>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table><thead><tr><th>Student ID</th><th>Name</th><th>Exam</th><th>Status</th><th>Joined At</th><th>Progress</th></tr></thead><tbody id="att-tbl"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- Uploaded Question Bank Files in Exam Manager -->
+  <div class="card" style="margin-bottom:16px" id="em-qb-files-card">
+    <div class="card-hd">
+      <div><div class="card-title">Uploaded Question Bank Files</div><div class="card-sub">Files available for exam assignment</div></div>
+      <button class="btn btn-outline btn-sm" onclick="openM('m-qb-upload')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload More</button>
+    </div>
+    <div class="card-bd" style="padding-top:10px">
+      <div id="em-qb-empty" style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No question bank files uploaded yet. Click "Upload Question Bank" to add files.</div>
+      <div class="tbl-wrap" id="em-qb-tbl-wrap" style="display:none">
+        <table><thead><tr><th>#</th><th>File Name</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead><tbody id="em-qb-tbl"></tbody></table>
+      </div>
+    </div>
+  </div>
   <div class="filter-bar">
     <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search exams…" oninput="filterExams(this.value)"></div>
     <select class="filter-select" onchange="filterExamSt(this.value)"><option value="">All Status</option><option>Live</option><option>Upcoming</option><option>Ended</option><option>Graded</option></select>
@@ -621,7 +765,7 @@ loadAttendance();
     <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search by name or ID…" oninput="filterStudents(this.value)"></div>
     <select class="filter-select" onchange="filterStudSt(this.value)"><option value="">All Status</option><option>Enabled</option><option>Disabled</option><option>Flagged</option></select>
   </div>
-  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Student ID</th><th>Name</th><th>Department</th><th>Sem</th><th>Exams</th><th>Status</th><th>Access</th><th>Actions</th></tr></thead><tbody id="stud-tbl"></tbody></table></div></div>
+  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Student ID</th><th>Name</th><th>Department</th><th>Sem</th><th>Exams</th><th>Status / Access</th><th>Actions</th></tr></thead><tbody id="stud-tbl"></tbody></table></div></div>
 </div>
 
 <!-- ══ RESULTS ══ -->
@@ -633,7 +777,30 @@ loadAttendance();
 
 <!-- ══ QUESTION BANK ══ -->
 <div class="page" id="pg-qb">
-  <div class="page-hd"><div><div class="page-title">Question Bank</div><div class="page-sub">Manage and assign question sets to exams</div></div><button class="btn btn-primary" onclick="openM('m-qb')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Question</button></div>
+  <div class="page-hd"><div><div class="page-title">Question Bank</div><div class="page-sub">Manage and assign question sets to exams</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline" onclick="openM('m-qb-upload')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload File</button>
+      <button class="btn btn-primary" onclick="openM('m-qb')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Question</button>
+    </div>
+  </div>
+
+  <!-- Uploaded QB Files Section -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-hd">
+      <div><div class="card-title">📂 Uploaded Question Bank Files</div><div class="card-sub">All uploaded files are available for exam assignment</div></div>
+      <span id="qb-file-count-badge" class="sb-badge blue" style="font-size:11px;padding:4px 10px">0 Files</span>
+    </div>
+    <div class="card-bd" style="padding-top:10px">
+      <div id="qb-files-empty" style="text-align:center;padding:24px;color:var(--text3);font-size:13px">
+        <div style="font-size:32px;margin-bottom:8px">📭</div>
+        No files uploaded yet. Click <strong>Upload File</strong> to add question bank files.
+      </div>
+      <div id="qb-files-tbl-wrap" style="display:none">
+        <div class="tbl-wrap"><table><thead><tr><th>#</th><th>File Name</th><th>Subject</th><th>Set Tag</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead><tbody id="qb-files-tbl"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
   <div class="g2">
     <div class="card">
       <div class="card-hd"><div class="card-title">All Questions</div></div>
@@ -872,17 +1039,46 @@ function renderExamTbl(data){
   </tr>`).join('');
 }
 function renderStudents(data){
-  document.getElementById('stud-tbl').innerHTML=(data||STUDENTS).map(s=>`<tr>
+  document.getElementById('stud-tbl').innerHTML=(data||STUDENTS).map((s,idx)=>`<tr id="stud-row-${idx}">
     <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">${s.id}</td>
     <td style="font-weight:700;font-size:13px">${s.name}${s.flagged?'<span class="pill p-flagged" style="margin-left:6px;font-size:9.5px">⚑ Flagged</span>':''}</td>
     <td style="color:var(--text2)">${s.dept}</td>
     <td style="color:var(--text2)">${s.sem}</td>
     <td style="font-family:'DM Mono',monospace">${s.exams}</td>
-    <td>${s.enabled?'<span class="pill p-on"><span class="pill-dot"></span>Enabled</span>':'<span class="pill p-off"><span class="pill-dot"></span>Disabled</span>'}</td>
-    <td><label class="toggle"><input type="checkbox" ${s.enabled?'checked':''} onchange="toast(this.checked?'✅':'⛔','Access updated for ${s.name}')"><span class="tog-track"></span><span class="tog-thumb"></span></label></td>
-    <td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm" onclick="toast('🔑','Password reset for ${s.name}!')">Reset</button><button class="btn btn-danger btn-sm" onclick="toast('⛔','${s.name} removed!')">Remove</button></div></td>
+    <td>
+      <div style="display:flex;align-items:center;gap:10px;min-width:110px">
+        <div class="stud-tog ${s.enabled?'tog-on':'tog-off'}" onclick="toggleStudentAccess(this,${idx},'${s.name}')" style="position:relative;width:40px;height:22px;flex-shrink:0;border-radius:20px;cursor:pointer;transition:background .2s;background:${s.enabled?'var(--primary)':'#d1d5db'};border:1.5px solid ${s.enabled?'var(--primary)':'#9ca3af'}">
+          <div style="position:absolute;top:2px;left:${s.enabled?'19':'2'}px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.25)"></div>
+        </div>
+        <span class="stud-lbl" style="font-size:12.5px;font-weight:700;color:${s.enabled?'var(--green)':'var(--text3)'};min-width:52px">${s.enabled?'Enabled':'Disabled'}</span>
+      </div>
+    </td>
+    <td><div style="display:flex;gap:4px;flex-wrap:nowrap">
+      <button class="btn btn-outline btn-sm" onclick="toast('🎫','Admit card for ${s.name}!')">🎫 Admit</button>
+      <button class="btn btn-outline btn-sm" onclick="toast('🔑','Password reset for ${s.name}!')">Reset</button>
+      <button class="btn btn-danger btn-sm" onclick="toast('⛔','${s.name} removed!')">Remove</button>
+    </div></td>
   </tr>`).join('');
 }
+window.toggleStudentAccess=function(togEl,idx,name){
+  const s=STUDENTS[idx];
+  if(!s)return;
+  s.enabled=!s.enabled;
+  const thumb=togEl.querySelector('div');
+  const lbl=togEl.parentElement.querySelector('.stud-lbl');
+  if(s.enabled){
+    togEl.style.background='var(--primary)';
+    togEl.style.borderColor='var(--primary)';
+    if(thumb)thumb.style.left='19px';
+    if(lbl){lbl.textContent='Enabled';lbl.style.color='var(--green)';}
+  } else {
+    togEl.style.background='#d1d5db';
+    togEl.style.borderColor='#9ca3af';
+    if(thumb)thumb.style.left='2px';
+    if(lbl){lbl.textContent='Disabled';lbl.style.color='var(--text3)';}
+  }
+  toast(s.enabled?'✅':'⛔',(s.enabled?'Access enabled':'Access disabled')+' for '+name);
+};
 function renderResults(f){
   let d=RESULTS;
   if(f==='pass')d=RESULTS.filter(r=>r.marks>=40);
@@ -1026,9 +1222,258 @@ setInterval(()=>{
 /* ── COUNT UP ── */
 function countUp(el,target){let c=0;const step=Math.ceil(target/40);const t=setInterval(()=>{c=Math.min(c+step,target);el.textContent=c.toLocaleString();if(c>=target)clearInterval(t);},25);}
 
+/* ══════════════ QUESTION BANK FILE UPLOAD ══════════════ */
+let QB_FILES = [];
+
+function getFileIcon(name){
+  const ext=(name.split('.').pop()||'').toLowerCase();
+  const icons={pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',csv:'📊',txt:'📃',json:'🗂️',zip:'🗜️',rar:'🗜️',ppt:'📑',pptx:'📑',png:'🖼️',jpg:'🖼️',jpeg:'🖼️'};
+  return icons[ext]||'📁';
+}
+function formatBytes(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+
+function handleQBDrop(e){
+  e.preventDefault();
+  const zone=document.getElementById('qbu-drop-zone');
+  zone.style.borderColor='var(--border2)';zone.style.background='var(--surface)';
+  handleQBFileSelect(e.dataTransfer.files);
+}
+function handleQBFileSelect(files){
+  const list=document.getElementById('qbu-file-list');
+  const pending=[...files];
+  if(!pending.length)return;
+  list.innerHTML=pending.map((f,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px">
+    <span style="font-size:20px">${getFileIcon(f.name)}</span>
+    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</div><div style="font-size:11px;color:var(--text3)">${formatBytes(f.size)}</div></div>
+    <span class="pill p-on" style="font-size:10px">Ready</span>
+  </div>`).join('');
+  list._pendingFiles=pending;
+}
+function commitQBUpload(){
+  const list=document.getElementById('qbu-file-list');
+  const pending=list._pendingFiles||[];
+  if(!pending.length){toast('⚠️','Please select at least one file first.');return;}
+  const subject=document.getElementById('qbu-subject').value;
+  const tag=document.getElementById('qbu-tag').value||('QS-'+subject.replace(/\s/g,'')+'-'+new Date().getFullYear());
+  const now=new Date();
+  const uploaded=now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  pending.forEach(f=>{
+    QB_FILES.push({id:'QBF-'+Date.now()+Math.random().toString(36).substr(2,4).toUpperCase(),name:f.name,subject,tag,size:formatBytes(f.size),uploaded,raw:f});
+  });
+  closeM('m-qb-upload');
+  document.getElementById('qbu-file-list').innerHTML='';
+  list._pendingFiles=[];
+  document.getElementById('qbu-tag').value='';
+  renderQBFiles();
+  toast('✅',`${pending.length} file(s) uploaded to Question Bank!`);
+}
+function renderQBFiles(){
+  const count=QB_FILES.length;
+  // Update badge
+  const badge=document.getElementById('qb-file-count-badge');
+  if(badge)badge.textContent=count+' File'+(count!==1?'s':'');
+  // QB page
+  const empty=document.getElementById('qb-files-empty');
+  const wrap=document.getElementById('qb-files-tbl-wrap');
+  if(empty)empty.style.display=count?'none':'block';
+  if(wrap)wrap.style.display=count?'block':'none';
+  if(document.getElementById('qb-files-tbl')){
+    document.getElementById('qb-files-tbl').innerHTML=QB_FILES.map((f,i)=>`<tr>
+      <td style="font-family:'DM Mono',monospace;color:var(--text3);font-size:12px">${i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${getFileIcon(f.name)}</span><div><div style="font-size:13px;font-weight:700;color:var(--text)">${f.name}</div><div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${f.id}</div></div></div></td>
+      <td>${sTag(f.subject)}</td>
+      <td style="font-size:11px;color:var(--primary);font-weight:600">${f.tag}</td>
+      <td style="font-size:12px;color:var(--text2)">${(f.name.split('.').pop()||'').toUpperCase()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${f.size}</td>
+      <td style="font-size:12px;color:var(--text3)">${f.uploaded}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-outline btn-sm" onclick="viewQBFile(${i})">👁 View</button>
+        <button class="btn btn-success btn-sm" onclick="toast('✅','File assigned to exam!')">Assign</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteQBFile(${i})">Del</button>
+      </div></td>
+    </tr>`).join('');
+  }
+  // Exam Manager QB files panel
+  const emEmpty=document.getElementById('em-qb-empty');
+  const emWrap=document.getElementById('em-qb-tbl-wrap');
+  if(emEmpty)emEmpty.style.display=count?'none':'block';
+  if(emWrap)emWrap.style.display=count?'block':'none';
+  if(document.getElementById('em-qb-tbl')){
+    document.getElementById('em-qb-tbl').innerHTML=QB_FILES.map((f,i)=>`<tr>
+      <td style="font-family:'DM Mono',monospace;color:var(--text3);font-size:12px">${i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${getFileIcon(f.name)}</span><span style="font-size:13px;font-weight:700;color:var(--text)">${f.name}</span></div></td>
+      <td style="font-size:12px;color:var(--text2)">${(f.name.split('.').pop()||'').toUpperCase()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${f.size}</td>
+      <td style="font-size:12px;color:var(--text3)">${f.uploaded}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-outline btn-sm" onclick="viewQBFile(${i})">👁 View</button>
+        <button class="btn btn-success btn-sm" onclick="toast('✅','Assigned to exam!')">Assign</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteQBFile(${i})">Del</button>
+      </div></td>
+    </tr>`).join('');
+  }
+}
+function viewQBFile(idx){
+  const f=QB_FILES[idx];
+  if(!f)return;
+  document.getElementById('qbv-title').textContent=getFileIcon(f.name)+' '+f.name;
+  document.getElementById('qbv-details').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">File ID</div><div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--primary)">${f.id}</div></div>
+      <div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Subject</div><div style="font-size:13px;font-weight:700">${f.subject}</div></div>
+      <div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Question Set Tag</div><div style="font-size:13px;font-weight:700;color:var(--blue)">${f.tag}</div></div>
+      <div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Format</div><div style="font-size:13px;font-weight:700">${(f.name.split('.').pop()||'').toUpperCase()}</div></div>
+      <div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">File Size</div><div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace">${f.size}</div></div>
+      <div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Uploaded</div><div style="font-size:13px;font-weight:700">${f.uploaded}</div></div>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Assign to Exam</div>
+      <select class="form-input"><option>Mid-Term Physics</option><option>Calculus Final</option><option>English Literature</option><option>Organic Chemistry</option><option>Biology Semester</option></select>
+    </div>`;
+  document.getElementById('qbv-delete-btn').onclick=()=>{deleteQBFile(idx);closeM('m-qb-view');};
+  openM('m-qb-view');
+}
+function deleteQBFile(idx){
+  if(confirm('Delete this file from the Question Bank?')){QB_FILES.splice(idx,1);renderQBFiles();toast('🗑️','File removed from Question Bank.');}}
+
+/* ══════════════ LIVE ATTENDANCE ══════════════ */
+const ATT_DATA=[
+  {id:'STU2025001',name:'Ananya Singh',exam:'Mid-Term Physics',status:'Present',joined:'09:58 AM',prog:62},
+  {id:'STU2025002',name:'Rahul Verma',exam:'Calculus Final',status:'Present',joined:'10:01 AM',prog:48},
+  {id:'STU2025003',name:'Meera Pillai',exam:'Mid-Term Physics',status:'Present',joined:'09:55 AM',prog:75},
+  {id:'STU2025004',name:'Arjun Mehta',exam:'Calculus Final',status:'Present',joined:'10:03 AM',prog:44},
+  {id:'STU2025005',name:'Divya Rao',exam:'English Literature',status:'Absent',joined:'—',prog:0},
+  {id:'STU2025006',name:'Sai Krishna',exam:'Mid-Term Physics',status:'Present',joined:'10:00 AM',prog:55},
+  {id:'STU2025007',name:'Priya Nair',exam:'Mid-Term Physics',status:'Present',joined:'09:59 AM',prog:71},
+  {id:'STU2025008',name:'Karthik M.',exam:'English Literature',status:'Absent',joined:'—',prog:0},
+];
+function renderAttendance(filterExam){
+  let data=filterExam?ATT_DATA.filter(a=>a.exam===filterExam):ATT_DATA;
+  const reg=data.length,pres=data.filter(a=>a.status==='Present').length,abs=reg-pres;
+  const pct=reg?Math.round(pres/reg*100):0;
+  const ae=document.getElementById('att-registered');if(ae)ae.textContent=reg;
+  const pe=document.getElementById('att-present');if(pe)pe.textContent=pres;
+  const abe=document.getElementById('att-absent');if(abe)abe.textContent=abs;
+  const pce=document.getElementById('att-pct');if(pce)pce.textContent=pct+'%';
+  if(document.getElementById('att-tbl')){
+    document.getElementById('att-tbl').innerHTML=data.map(a=>`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">${a.id}</td>
+      <td style="font-weight:700;font-size:13px">${a.name}</td>
+      <td style="font-size:12px;color:var(--text2)">${a.exam}</td>
+      <td>${a.status==='Present'?'<span class="pill p-on"><span class="pill-dot"></span>Present</span>':'<span class="pill p-off"><span class="pill-dot"></span>Absent</span>'}</td>
+      <td style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text3)">${a.joined}</td>
+      <td style="min-width:100px">${a.status==='Present'?scoreBar(a.prog):'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
+    </tr>`).join('');
+  }
+}
+window.filterAttByExam=function(v){renderAttendance(v||null);};
+// Live ticker for attendance
+setInterval(()=>{
+  ATT_DATA.forEach(a=>{if(a.status==='Present'&&a.prog<95)a.prog=Math.min(95,a.prog+(Math.random()>.6?1:0));});
+  const sel=document.getElementById('att-exam-select');
+  renderAttendance(sel&&sel.value?sel.value:null);
+},5000);
+
+/* ══════════════ ADMIT CARD GENERATOR ══════════════ */
+window.switchAdmitTab=function(tab,btn){
+  document.querySelectorAll('#m-admit-bulk .tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ['bulk','individual','preview'].forEach(t=>{
+    const el=document.getElementById('admit-'+t+'-section');
+    if(el)el.style.display=t===tab?'block':'none';
+  });
+};
+window.generateBulkAdmitCards=function(){
+  toast('🎫','Generating admit cards for all registered students…');
+  setTimeout(()=>{
+    const w=window.open('','_blank','width=800,height=600');
+    if(!w){toast('⚠️','Pop-up blocked. Please allow pop-ups for printing.');return;}
+    const exam=document.getElementById('admit-exam').value;
+    const hall=document.getElementById('admit-hall').value;
+    const date=document.getElementById('admit-date').value;
+    const time=document.getElementById('admit-time').value;
+    const instr=document.getElementById('admit-instructions').value||'Bring valid photo ID. No electronic devices allowed.';
+    const cards=STUDENTS.map((s,i)=>`
+      <div style="border:2px solid #1a56db;border-radius:12px;padding:20px;margin-bottom:20px;font-family:'Arial',sans-serif;page-break-inside:avoid">
+        <div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid #1a56db;padding-bottom:12px;margin-bottom:14px">
+          <div style="width:44px;height:44px;background:#1a56db;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px">SEB</div>
+          <div><div style="font-size:15px;font-weight:800;color:#1a56db">SEB ExamPortal</div><div style="font-size:10px;color:#9ca3af;font-weight:600;letter-spacing:.5px">HALL ADMISSION CARD</div></div>
+          <div style="margin-left:auto;text-align:right"><div style="font-size:10px;color:#9ca3af">Card No.</div><div style="font-size:13px;font-weight:700;font-family:monospace;color:#1a56db">AC-2025-${String(i+1).padStart(3,'0')}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Student Name</div><div style="font-size:13px;font-weight:700">${s.name}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Student ID</div><div style="font-size:13px;font-weight:700;font-family:monospace">${s.id}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Exam</div><div style="font-size:13px;font-weight:700">${exam}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Department</div><div style="font-size:13px;font-weight:700">${s.dept}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Date</div><div style="font-size:13px;font-weight:700">${date}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Time</div><div style="font-size:13px;font-weight:700">${time}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Hall</div><div style="font-size:13px;font-weight:700">${hall}</div></div>
+          <div><div style="font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:.4px;text-transform:uppercase">Seat No.</div><div style="font-size:13px;font-weight:700;font-family:monospace;color:#1a56db">${String.fromCharCode(65+Math.floor(i/10))}-${String(i+1).padStart(2,'0')}</div></div>
+        </div>
+        <div style="background:#fffbeb;border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:#d97706;font-weight:600;margin-bottom:10px">⚠️ ${instr}</div>
+        <div style="display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;padding-top:8px;font-size:10px;color:#9ca3af">
+          <span>Generated by SEB ExamPortal v2.0</span><span style="font-family:monospace">Valid for exam date only</span>
+        </div>
+      </div>`).join('');
+    w.document.write(`<!DOCTYPE html><html><head><title>Admit Cards — ${exam}</title><style>body{font-family:Arial,sans-serif;padding:24px;background:#f0f4fa}@media print{body{background:#fff}.no-print{display:none}}</style></head><body>
+      <div class="no-print" style="text-align:center;margin-bottom:24px"><button onclick="window.print()" style="background:#1a56db;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Print All Admit Cards</button></div>
+      ${cards}</body></html>`);
+    w.document.close();
+    closeM('m-admit-bulk');
+    toast('✅',`${STUDENTS.length} admit cards generated!`);
+  },500);
+};
+window.generateIndividualAdmitCard=function(){
+  const sel=document.getElementById('admit-ind-student');
+  const sName=sel.options[sel.selectedIndex].text.split('—')[1]?.trim()||'Student';
+  const sId=sel.value;
+  const exam=document.getElementById('admit-ind-exam').value;
+  const date=document.getElementById('admit-ind-date').value;
+  const hall=document.getElementById('admit-ind-hall').value;
+  const seat=document.getElementById('admit-ind-seat').value||'TBD';
+  const time=document.getElementById('admit-ind-time').value;
+  const w=window.open('','_blank','width=700,height=500');
+  if(!w){toast('⚠️','Pop-up blocked. Please allow pop-ups.');return;}
+  w.document.write(`<!DOCTYPE html><html><head><title>Admit Card — ${sName}</title><style>body{font-family:Arial,sans-serif;padding:40px;background:#f0f4fa;display:flex;justify-content:center}@media print{body{background:#fff}.no-print{display:none}}</style></head><body>
+    <div style="max-width:480px;width:100%">
+    <div class="no-print" style="text-align:center;margin-bottom:20px"><button onclick="window.print()" style="background:#1a56db;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Print Admit Card</button></div>
+    <div style="border:2px solid #1a56db;border-radius:12px;padding:20px;background:#fff">
+      <div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid #1a56db;padding-bottom:12px;margin-bottom:14px">
+        <div style="width:44px;height:44px;background:#1a56db;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px">SEB</div>
+        <div><div style="font-size:15px;font-weight:800;color:#1a56db">SEB ExamPortal</div><div style="font-size:10px;color:#9ca3af;font-weight:600">HALL ADMISSION CARD</div></div>
+        <div style="margin-left:auto;text-align:right"><div style="font-size:10px;color:#9ca3af">Card No.</div><div style="font-size:13px;font-weight:700;font-family:monospace;color:#1a56db">AC-IND-${Date.now().toString().slice(-6)}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div><div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase">Student Name</div><div style="font-size:13px;font-weight:700">${sName}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase">Student ID</div><div style="font-size:13px;font-weight:700;font-family:monospace">${sId}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase">Exam</div><div style="font-size:13px;font-weight:700">${exam}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase">Date</div><div style="font-size:13px;font-weight:700">${date}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase">Hall</div><div style="font-size:13px;font-weight:700">${hall}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase">Seat No.</div><div style="font-size:13px;font-weight:700;font-family:monospace;color:#1a56db">${seat}</div></div>
+        <div><div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase">Time</div><div style="font-size:13px;font-weight:700">${time}</div></div>
+      </div>
+      <div style="background:#fffbeb;border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:#d97706;font-weight:600;margin-bottom:10px">⚠️ Bring valid photo ID. No electronic devices allowed.</div>
+      <div style="display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;padding-top:8px;font-size:10px;color:#9ca3af"><span>Generated by SEB ExamPortal v2.0</span><span style="font-family:monospace">Valid for exam date only</span></div>
+    </div></div></body></html>`);
+  w.document.close();
+  closeM('m-admit-bulk');
+  toast('🎫','Admit card generated for '+sName+'!');
+};
+window.printAdmitCard=function(){
+  const cardHTML=document.getElementById('admit-card-preview').innerHTML;
+  const w=window.open('','_blank','width=600,height=500');
+  if(!w){toast('⚠️','Pop-up blocked. Please allow pop-ups.');return;}
+  w.document.write(`<!DOCTYPE html><html><head><title>Admit Card Preview</title><style>body{font-family:'DM Sans',Arial,sans-serif;padding:40px;background:#f0f4fa;display:flex;justify-content:center}@media print{body{background:#fff}.no-print{display:none}}</style></head><body>
+    <div style="max-width:520px;width:100%">
+    <div class="no-print" style="text-align:center;margin-bottom:20px"><button onclick="window.print()" style="background:#1a56db;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Print</button></div>
+    <div style="border:2px solid #1a56db;border-radius:12px;padding:20px;background:#fff">${cardHTML}</div></div></body></html>`);
+  w.document.close();
+};
+
 /* ── INIT ── */
 renderDashTbl();renderFeed();renderSubjProg();renderUpcoming();
 renderExamTbl();renderStudents();renderResults('all');renderQB();renderProctor();renderCreds();renderNoticeHist();
+renderAttendance(null);renderQBFiles();
 setTimeout(()=>{
   initChart();
   const se=document.getElementById('s-students'),qe=document.getElementById('s-exams'),qb=document.getElementById('s-qb');

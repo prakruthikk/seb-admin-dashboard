@@ -339,38 +339,11 @@ body::before{
       </div>
     </div>
 
-    <!-- OTP Step -->
-    <div class="otp-wrap" id="otp-wrap">
-      <div class="otp-header">
-        <div class="otp-emoji">📲</div>
-        <div class="otp-title">Two-Factor Verification</div>
-        <div class="otp-sub">Enter the 6-digit OTP sent to your registered email &amp; phone</div>
-        <div class="otp-demo">Demo OTP: 4 8 2 7 1 6</div>
-      </div>
-      <div class="otp-inputs">
-        <input class="otp-input" maxlength="1" inputmode="numeric" id="o0" oninput="onOtp(this,0)">
-        <input class="otp-input" maxlength="1" inputmode="numeric" id="o1" oninput="onOtp(this,1)">
-        <input class="otp-input" maxlength="1" inputmode="numeric" id="o2" oninput="onOtp(this,2)">
-        <input class="otp-input" maxlength="1" inputmode="numeric" id="o3" oninput="onOtp(this,3)">
-        <input class="otp-input" maxlength="1" inputmode="numeric" id="o4" oninput="onOtp(this,4)">
-        <input class="otp-input" maxlength="1" inputmode="numeric" id="o5" oninput="onOtp(this,5)">
-      </div>
-      <button class="btn-login" type="button" onclick="verifyOTP()" style="margin-bottom:12px">
-        <svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>Verify &amp; Sign In</span>
-      </button>
-      <div class="otp-timer">OTP expires in <strong id="otp-time">04:59</strong></div>
-      <div class="otp-links" style="margin-top:10px">
-        <span onclick="resendOTP()">Resend OTP</span> &nbsp;·&nbsp;
-        <span onclick="backToLogin()">← Back to Login</span>
-      </div>
-    </div>
-
     <div class="divider">Secured Connection</div>
     <div class="security-row">
       <div class="sec-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>SSL Encrypted</div>
-      <div class="sec-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>2FA Protected</div>
       <div class="sec-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Session Logged</div>
+      <div class="sec-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Secure Portal</div>
     </div>
   </div>
 
@@ -458,10 +431,9 @@ function doLogin() {
       document.getElementById('pwd').value = '';
       return;
     }
-    // Save pending session
-    localStorage.setItem('seb_pending', JSON.stringify({ uid, name: u.name, role: u.role }));
-    showOK('Credentials verified! Sending OTP…');
-    setTimeout(show2FA, 900);
+    // Save session and redirect directly to dashboard (no OTP)
+    showOK('Credentials verified! Loading dashboard…');
+    setTimeout(() => showLoader(uid, u), 600);
   }, 1300);
 }
 
@@ -515,25 +487,23 @@ function updateOTPTime() {
   document.getElementById('otp-time').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
 }
 
-function showLoader() {
+function showLoader(uid, u) {
   const ov = document.getElementById('load-overlay');
   const bar = document.getElementById('load-fill');
   const sub = document.getElementById('load-sub');
   ov.classList.add('show');
   const steps = [
-    [10, 'Authenticating session…'],
-    [35, 'Verifying 2FA token…'],
-    [60, 'Loading dashboard…'],
-    [85, 'Establishing secure session…'],
+    [20, 'Authenticating session…'],
+    [50, 'Loading dashboard…'],
+    [80, 'Establishing secure session…'],
     [100, 'Launching admin panel…']
   ];
   let i = 0;
   function step() {
     if (i >= steps.length) {
-      // Save session to localStorage (works across pages in both file:// and Live Server)
-      const p = JSON.parse(localStorage.getItem('seb_pending') || '{}');
+      // Save session to localStorage
       const sessionData = {
-        ...p,
+        uid, name: u.name, role: u.role,
         loggedIn: true,
         loginTime: new Date().toISOString(),
         sessionId: 'SEB-' + Math.random().toString(36).substr(2, 9).toUpperCase()
