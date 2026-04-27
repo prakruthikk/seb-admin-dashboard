@@ -98,11 +98,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;backgroun
 .tb-search svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;flex-shrink:0}
 .tb-search input{background:none;border:none;outline:none;font-size:13px;color:var(--text);width:100%}
 .tb-search input::placeholder{color:var(--text3)}
-.tb-btn{width:36px;height:36px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--white);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative}
-.tb-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-lt)}
-.tb-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.tb-btn.logout{border-color:rgba(220,38,38,.25);color:var(--red)}
-.tb-btn.logout:hover{background:var(--red-lt);border-color:rgba(220,38,38,.4)}
 .notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
 .session-chip{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:5px 11px;font-size:12px;font-weight:600;color:var(--text2)}
 .session-chip svg{width:13px;height:13px;stroke:var(--green);fill:none;stroke-width:2.5}
@@ -140,35 +135,82 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;backgroun
 /* ══════════════ TABLE ══════════════ */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{text-align:left;padding:9px 13px;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text3);border-bottom:1.5px solid var(--border);background:var(--surface);white-space:nowrap}
+thead th{
+  text-align:left;padding:11px 13px;
+  font-size:11px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;
+  color:#fff !important;
+  background:linear-gradient(135deg,#1a56db 0%,#2563eb 100%);
+  border:none;white-space:nowrap;
+}
+thead th:first-child{border-radius:var(--r-sm) 0 0 0}
+thead th:last-child{border-radius:0 var(--r-sm) 0 0}
 tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
 tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--surface)}
-td{padding:11px 13px;vertical-align:middle}
+tbody tr:hover{background:var(--primary-lt)}
+td{padding:10px 13px;vertical-align:middle;white-space:nowrap}
+/* action cells: never wrap */
+td:last-child>div{display:flex;gap:5px;align-items:center;flex-wrap:nowrap}
 
 /* ══════════════ PILLS ══════════════ */
-.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.1px}
-.pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
-.p-live{background:var(--green-lt);color:var(--green)}
-.p-upcoming{background:var(--amber-lt);color:var(--amber)}
-.p-ended{background:#f3f4f6;color:#6b7280}
-.p-graded{background:var(--blue-lt);color:var(--blue)}
-.p-flagged{background:var(--red-lt);color:var(--red)}
-.p-on{background:var(--green-lt);color:var(--green)}
-.p-off{background:var(--red-lt);color:var(--red)}
+.pill{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  font-size:11.5px;font-weight:700;
+  padding:0 11px;
+  height:26px;
+  min-width:82px;
+  border-radius:20px;letter-spacing:.1px;
+  box-sizing:border-box;white-space:nowrap;
+}
+.pill-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.p-live    {background:var(--green-lt);color:var(--green);border:1.5px solid var(--green-b)}
+.p-upcoming{background:var(--amber-lt);color:var(--amber);border:1.5px solid var(--amber-b)}
+.p-ended   {background:#f3f4f6;color:#6b7280;border:1.5px solid #e5e7eb}
+.p-graded  {background:var(--blue-lt);color:var(--blue);border:1.5px solid var(--blue-b)}
+.p-flagged {background:var(--red-lt);color:var(--red);border:1.5px solid var(--red-b)}
+.p-on      {background:var(--green-lt);color:var(--green);border:1.5px solid var(--green-b)}
+.p-off     {background:var(--red-lt);color:var(--red);border:1.5px solid var(--red-b)}
+.p-ok      {background:var(--green-lt);color:var(--green);border:1.5px solid var(--green-b)}
 
-/* ══════════════ BUTTONS ══════════════ */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r-sm);font-size:12.5px;font-weight:700;border:none;cursor:pointer;transition:all .15s;letter-spacing:.1px}
-.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-dk);box-shadow:0 4px 12px rgba(26,86,219,.3)}
-.btn-outline{background:var(--white);color:var(--text2);border:1.5px solid var(--border)}
+/* Tab-switch column: center align */
+#proc-tbl th:nth-child(4),#proc-tbl td:nth-child(4){text-align:center}
+
+/* ══════════════ BUTTONS — FULLY UNIFIED ══════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:36px;padding:0 16px;min-width:0;
+  border-radius:8px;
+  font-size:13px;font-weight:700;font-family:inherit;
+  border:1.5px solid transparent;
+  cursor:pointer;transition:all .15s;
+  letter-spacing:.1px;white-space:nowrap;
+  flex-shrink:0;line-height:1;box-sizing:border-box;vertical-align:middle;
+}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;flex-shrink:0}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-dk);border-color:var(--primary-dk);box-shadow:0 4px 12px rgba(26,86,219,.28)}
+.btn-outline{background:var(--white);color:var(--text2);border-color:var(--border)}
 .btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-lt)}
-.btn-danger{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red-b)}
-.btn-danger:hover{background:#fee2e2}
-.btn-success{background:var(--green-lt);color:var(--green);border:1.5px solid var(--green-b)}
-.btn-success:hover{background:#d1fae5}
-.btn-sm{padding:5px 10px;font-size:11.5px}
+.btn-danger{background:var(--red-lt);color:var(--red);border-color:var(--red-b)}
+.btn-danger:hover{background:#fee2e2;border-color:#f87171}
+.btn-success{background:var(--green-lt);color:var(--green);border-color:var(--green-b)}
+.btn-success:hover{background:#d1fae5;border-color:#34d399}
+/* Small — ONLY for inside table rows */
+.btn-sm{height:30px !important;padding:0 10px !important;font-size:11.5px !important;border-radius:6px !important}
+.btn-sm svg{width:12px !important;height:12px !important}
+/* Full width */
+.btn-full{width:100% !important}
+/* Topbar icon-only */
+.tb-btn{
+  width:36px;height:36px;padding:0;border-radius:8px;
+  border:1.5px solid var(--border);background:var(--white);color:var(--text2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;position:relative;flex-shrink:0;box-sizing:border-box;
+}
+.tb-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-lt)}
+.tb-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.tb-btn.logout{border-color:rgba(220,38,38,.25);color:var(--red)}
+.tb-btn.logout:hover{background:var(--red-lt);border-color:#f87171}
 
 /* ══════════════ FORM ══════════════ */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
@@ -206,9 +248,9 @@ select.form-input option{background:#fff}
 .toggle input:checked~.tog-thumb{transform:translateX(17px)}
 
 /* ══════════════ INFO ROWS ══════════════ */
-.info-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px}
-.info-label{font-size:12.5px;color:var(--text2);font-weight:500}
-.info-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)}
+.info-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px;min-width:0}
+.info-label{font-size:12.5px;color:var(--text2);font-weight:500;flex:1;min-width:0}
+.info-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text);flex-shrink:0}
 
 /* ══════════════ ALERT STRIPS ══════════════ */
 .alert{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-radius:var(--r-sm);margin-bottom:12px;font-size:13px;font-weight:500;line-height:1.4}
@@ -258,10 +300,10 @@ select.form-input option{background:#fff}
 .s-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px}
 
 /* ══════════════ SCORE BAR ══════════════ */
-.score-row{display:flex;align-items:center;gap:8px}
-.score-track{flex:1;height:6px;background:var(--surface);border-radius:3px;overflow:hidden;border:1px solid var(--border)}
-.score-fill{height:100%;border-radius:3px}
-.score-val{font-size:11.5px;font-weight:700;font-family:'DM Mono',monospace;min-width:34px;text-align:right}
+.score-row{display:flex;align-items:center;gap:8px;min-width:90px}
+.score-track{flex:1;height:8px;background:var(--surface);border-radius:4px;overflow:hidden;border:1px solid var(--border);min-width:50px}
+.score-fill{height:100%;border-radius:4px}
+.score-val{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;min-width:38px;text-align:right}
 
 /* ══════════════ TOAST ══════════════ */
 #toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:none}
@@ -280,33 +322,209 @@ select.form-input option{background:#fff}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
 
-/* ══════════════ QB FILE DROP ZONE ══════════════ */
-#qbu-drop-zone:hover{border-color:var(--primary)!important;background:var(--primary-lt)!important}
+/* ══════════════ RESULTS CHART ══════════════ */
+.res-chart-wrap{position:relative;height:230px}
+
+/* ══════════════ RESULTS FILTER BAR ══════════════ */
+.res-filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.res-filter-bar .filter-search{flex:1;min-width:150px}
+.res-filter-bar .filter-select{min-width:130px}
+
+/* ══════════════ CHART SUBJECT LEGEND ══════════════ */
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;padding:0 4px}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text2)}
+.chart-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 
 /* ══════════════ ADMIT CARD PRINT ══════════════ */
 @media print{.sidebar,.topbar,.tb-btn{display:none!important}}
 
-/* ══════════════ RESPONSIVE ══════════════ */
+/* ══════════════ RESPONSIVE — 1100px ══════════════ */
 @media(max-width:1100px){
   .stats-row{grid-template-columns:1fr 1fr}
   .g32,.g41{grid-template-columns:1fr}
 }
+
+/* ══════════════ RESPONSIVE — 900px (tablet) ══════════════ */
+@media(max-width:900px){
+  /* results table: hide marks col, keep score+grade+status */
+  #res-tbl th:nth-child(3),#res-tbl td:nth-child(3){display:none}
+  /* credential table: hide password col */
+  #cred-tbl th:nth-child(3),#cred-tbl td:nth-child(3){display:none}
+}
+
+/* ══════════════ RESPONSIVE — 800px (tablet/mobile) ══════════════ */
 @media(max-width:800px){
+  /* sidebar slides off-screen */
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:none;box-shadow:4px 0 20px rgba(0,0,0,.15)}
   .sb-overlay.open{display:block}
   .main{margin-left:0}
   .hamburger{display:flex}
   .tb-search,.session-chip{display:none}
-  .g2{grid-template-columns:1fr}
+  /* grids collapse */
+  .g2,.g32,.g41{grid-template-columns:1fr}
   .form-grid{grid-template-columns:1fr}
+  /* spacing */
   .content{padding:14px}
-  .topbar{padding:0 14px;gap:8px}
+  .topbar{padding:0 14px;gap:10px}
+  .card-hd{flex-wrap:wrap;gap:8px}
+  /* modals slide up from bottom */
+  .modal{width:100%!important;max-height:92vh;border-radius:20px 20px 0 0;position:fixed;bottom:0;left:0;right:0;margin:0}
+  .modal-bg{align-items:flex-end;padding:0}
+  /* proctoring table: hide less critical cols */
+  #proc-tbl th:nth-child(5),#proc-tbl td:nth-child(5){display:none}
 }
-@media(max-width:520px){
-  .stats-row{grid-template-columns:1fr 1fr}
-  .stat-val{font-size:22px}
-  .page-hd{flex-direction:column}
+
+/* ══════════════ RESPONSIVE — 600px (mobile) ══════════════ */
+@media(max-width:600px){
+
+  /* ── STATS GRID ── */
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px}
+  .stat{padding:12px}
+  .stat-val{font-size:20px}
+  .stat-lbl{font-size:11px}
+  .stat-icon{width:34px;height:34px}
+  .stat-icon svg{width:16px;height:16px}
+
+  /* ── PAGE HEADER ── */
+  .page-hd{flex-direction:column;align-items:stretch;gap:10px}
+  /* Every button in page headers: full width, same 40px height */
+  .page-hd .btn,
+  .page-hd > button{
+    width:100% !important;
+    height:40px !important;
+    font-size:13px !important;
+    justify-content:center !important;
+    border-radius:8px !important;
+  }
+  /* Button groups in page headers stack vertically */
+  .page-hd > div[style*="flex"]{
+    flex-direction:column !important;
+    width:100%;
+    gap:8px !important;
+  }
+  .page-hd > div[style*="flex"] .btn{
+    width:100% !important;
+    height:40px !important;
+    justify-content:center !important;
+  }
+
+  /* ── TOP BAR ── */
+  .tb-live{display:none}
+  .content{padding:12px}
+  .topbar{padding:0 12px;gap:8px}
+
+  /* ── MOBILE CARD TABLES (hide table, show cards) ── */
+  .mob-hide{display:none!important}
+  .mob-cards{display:flex!important;flex-direction:column;gap:10px;padding-top:4px}
+  .mob-card{
+    background:var(--white);
+    border:1.5px solid var(--border);
+    border-radius:var(--r-sm);
+    padding:13px 14px;
+    display:flex;flex-direction:column;gap:7px;
+  }
+  .mob-card-row{
+    display:flex;align-items:center;
+    justify-content:space-between;
+    gap:8px;flex-wrap:nowrap;
+  }
+  .mob-card-label{
+    font-size:11px;font-weight:700;
+    color:var(--text3);
+    text-transform:uppercase;letter-spacing:.4px;
+    min-width:85px;flex-shrink:0;
+  }
+  .mob-card-val{
+    font-size:13px;color:var(--text);
+    font-weight:500;text-align:right;
+    flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  }
+  .mob-card-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px}
+  /* Mobile card action buttons — EXACT SAME SIZE */
+  .mob-card-actions{
+    display:flex;gap:8px;flex-wrap:wrap;
+    margin-top:8px;padding-top:10px;
+    border-top:1px solid var(--border);
+  }
+  .mob-card-actions .btn{
+    flex:1;min-width:0;
+    height:38px !important;
+    font-size:12.5px !important;
+    padding:0 10px !important;
+    justify-content:center !important;
+    border-radius:8px !important;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar{flex-direction:column;gap:8px}
+  .filter-search,.filter-select{width:100%}
+  .filter-select{height:40px}
+
+  /* ── ATTENDANCE GRID (4-col → 2-col) ── */
+  #pg-exams .card-bd > div[style*="repeat(4"]{grid-template-columns:1fr 1fr!important}
+
+  /* ── PROCTORING STATS (4 → 2x2) ── */
+  #pg-proctor .stats-row{grid-template-columns:1fr 1fr!important}
+
+  /* ── ALERT STRIP ── */
+  .alert{flex-wrap:wrap}
+  .alert > div{width:100%}
+  .alert .btn{
+    margin-left:0!important;margin-top:10px;
+    width:100%!important;height:40px!important;
+  }
+
+  /* ── TAB BAR ── */
+  .tab-bar{overflow-x:auto;width:100%;-webkit-overflow-scrolling:touch}
+  .tab{white-space:nowrap}
+
+  /* ── FORM GRID → 1 COLUMN ── */
+  .form-grid{grid-template-columns:1fr!important}
+  .fg-full{grid-column:1!important}
+  /* Modal form action buttons — equal width */
+  .fg-actions{flex-wrap:wrap;gap:8px}
+  .fg-actions .btn{
+    flex:1;min-width:120px;
+    height:40px!important;
+    justify-content:center!important;
+    font-size:13px!important;
+    border-radius:8px!important;
+  }
+
+  /* ── CHART ── */
+  .chart-box{height:160px!important}
+  .chart-legend{gap:6px 10px}
+  .chart-legend-item{font-size:10px}
+
+  /* ── PROGRESS BARS ── */
+  .prog-label{font-size:11px;width:72px}
+  .prog-val{font-size:11px;min-width:32px}
+
+  /* ── INFO ROWS ── */
+  .info-row{flex-wrap:nowrap;gap:8px}
+  .info-label{font-size:12px}
+  .info-val{font-size:12px}
+
+  /* ── CARD HEADER ── */
+  .card-hd{padding:14px 14px 0}
+  .card-bd{padding:12px 14px 14px}
+  .card-title{font-size:13.5px}
+
+  /* ── PAGE HEADER TEXT ── */
+  .page-title{font-size:16px}
+  .page-sub{font-size:12px}
+
+  /* ── RESULTS FILTER BAR ── */
+  .res-filter-bar{flex-direction:column;align-items:stretch;gap:8px}
+  .res-filter-bar .tab-bar{width:100%}
+  .res-filter-bar .filter-search{max-width:100%!important;width:100%!important}
+  .res-filter-bar .filter-select{width:100%!important;min-width:unset!important}
+  .res-chart-wrap{height:180px!important}
+
+  /* ── TOAST FULL WIDTH ── */
+  #toast{bottom:12px;right:12px;left:12px}
+  .toast-inner{width:100%}
 }
 </style>
 </head>
@@ -315,27 +533,37 @@ select.form-input option{background:#fff}
 <!-- SESSION GUARD -->
 <script>
 (function(){
+  // Auto-create a demo session if none exists (for direct file / GitHub Pages access)
   var raw = localStorage.getItem('seb_admin_session');
-  if(!raw){ window.location.replace('seb_admin_login.html'); return; }
+  if(!raw){
+    var demoSession = {
+      loggedIn: true,
+      name: 'Super Admin',
+      email: 'admin@sebportal.in',
+      role: 'super_admin',
+      loginTime: new Date().toISOString(),
+      sessionId: 'SEB-DEMO-' + Math.random().toString(36).substr(2,9).toUpperCase()
+    };
+    localStorage.setItem('seb_admin_session', JSON.stringify(demoSession));
+    raw = JSON.stringify(demoSession);
+  }
   try{
     var sess = JSON.parse(raw);
-    if(!sess || !sess.loggedIn){ window.location.replace('seb_admin_login.html'); return; }
-    var age = Date.now() - new Date(sess.loginTime).getTime();
-    if(age > 3600000){
-      localStorage.removeItem('seb_admin_session');
-      window.location.replace('seb_admin_login.html');
-      return;
+    if(!sess || !sess.loggedIn){
+      // Reset and create new session instead of blocking
+      var newSess = {loggedIn:true,name:'Super Admin',email:'admin@sebportal.in',role:'super_admin',loginTime:new Date().toISOString()};
+      localStorage.setItem('seb_admin_session', JSON.stringify(newSess));
     }
   } catch(e){
-    localStorage.removeItem('seb_admin_session');
-    window.location.replace('seb_admin_login.html');
-    return;
+    var newSess = {loggedIn:true,name:'Super Admin',email:'admin@sebportal.in',role:'super_admin',loginTime:new Date().toISOString()};
+    localStorage.setItem('seb_admin_session', JSON.stringify(newSess));
   }
 })();
 window.doLogout = function(){
   if(confirm('Are you sure you want to sign out?')){
     localStorage.removeItem('seb_admin_session');
-    window.location.replace('seb_admin_login.html');
+    // Try index.html first, fallback to login page
+    window.location.replace('index.html');
   }
 };
 </script>
@@ -376,8 +604,8 @@ window.doLogout = function(){
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn btn-outline" onclick="closeM('m-qb-view')">Close</button>
-        <button class="btn btn-primary" id="qbv-assign-btn" onclick="toast('✅','File assigned to exam!');closeM('m-qb-view')">Assign to Exam</button>
-        <button class="btn btn-danger" id="qbv-delete-btn">Delete File</button>
+        <button class="btn btn-primary btn-sm" id="qbv-assign-btn" onclick="toast('✅','File assigned to exam!');closeM('m-qb-view')">Assign to Exam</button>
+        <button class="btn btn-danger btn-sm" id="qbv-delete-btn">Delete File</button>
       </div>
     </div>
   </div>
@@ -641,14 +869,23 @@ window.doLogout = function(){
 
   <div class="g32">
     <div class="card">
-      <div class="card-hd">
-        <div><div class="card-title">Score Distribution by Subject</div><div class="card-sub">Average scores this week</div></div>
-        <div class="tab-bar" style="margin-bottom:0">
-          <button class="tab active" onclick="switchChart('week',this)">Week</button>
-          <button class="tab" onclick="switchChart('month',this)">Month</button>
+      <div class="card-hd" style="flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="card-title">Score Distribution by Subject</div>
+          <div class="card-sub">Average scores — last 7 days</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="tab-bar" style="margin-bottom:0">
+            <button class="tab active" onclick="switchDashChart('all',this)">All</button>
+            <button class="tab" onclick="switchDashChart('Physics',this)">Physics</button>
+            <button class="tab" onclick="switchDashChart('Maths',this)">Maths</button>
+            <button class="tab" onclick="switchDashChart('CS',this)">CS</button>
+          </div>
         </div>
       </div>
-      <div class="card-bd"><div class="chart-box"><canvas id="barChart"></canvas></div></div>
+      <div class="card-bd">
+        <div class="chart-box"><canvas id="barChart"></canvas></div>
+      </div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-title">Live Monitor</div><div class="card-sub">Right now</div></div>
@@ -667,10 +904,11 @@ window.doLogout = function(){
     <div class="card">
       <div class="card-hd">
         <div><div class="card-title">Active &amp; Upcoming Exams</div></div>
-        <button class="btn btn-primary btn-sm" onclick="openM('m-exam')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Exam</button>
+        <button class="btn btn-primary" onclick="openM('m-exam')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Exam</button>
       </div>
       <div class="card-bd" style="padding-top:10px">
-        <div class="tbl-wrap"><table><thead><tr><th>Exam</th><th>Students</th><th>Status</th><th>Cut-off</th><th>Action</th></tr></thead><tbody id="dash-tbl"></tbody></table></div>
+        <div class="tbl-wrap mob-hide"><table><thead><tr><th>Exam</th><th>Students</th><th>Status</th><th>Cut-off</th><th>Action</th></tr></thead><tbody id="dash-tbl"></tbody></table></div>
+        <div class="mob-cards" style="display:none" id="dash-mob"></div>
       </div>
     </div>
     <div class="card">
@@ -694,7 +932,7 @@ window.doLogout = function(){
 <!-- ══ EXAM MANAGER ══ -->
 <div class="page" id="pg-exams">
   <div class="page-hd"><div><div class="page-title">Exam Manager</div><div class="page-sub">Create, schedule and control all exams</div></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     <button class="btn btn-outline" onclick="openM('m-qb-upload')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Question Bank</button>
     <button class="btn btn-outline" onclick="openM('m-admit-bulk')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Admit Cards</button>
     <button class="btn btn-primary" onclick="openM('m-exam')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Exam</button>
@@ -755,7 +993,10 @@ window.doLogout = function(){
     <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search exams…" oninput="filterExams(this.value)"></div>
     <select class="filter-select" onchange="filterExamSt(this.value)"><option value="">All Status</option><option>Live</option><option>Upcoming</option><option>Ended</option><option>Graded</option></select>
   </div>
-  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Exam Title</th><th>Subject</th><th>Date</th><th>Duration</th><th>Students</th><th>Cut-off</th><th>Status</th><th>Proctor</th><th>Actions</th></tr></thead><tbody id="exam-tbl"></tbody></table></div></div>
+  <div class="card">
+    <div class="tbl-wrap mob-hide"><table><thead><tr><th>Exam Title</th><th>Subject</th><th>Date</th><th>Duration</th><th>Students</th><th>Cut-off</th><th>Status</th><th>Proctor</th><th>Actions</th></tr></thead><tbody id="exam-tbl"></tbody></table></div>
+    <div class="mob-cards" style="display:none" id="exam-mob"></div>
+  </div>
 </div>
 
 <!-- ══ STUDENTS ══ -->
@@ -765,20 +1006,57 @@ window.doLogout = function(){
     <div class="filter-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search by name or ID…" oninput="filterStudents(this.value)"></div>
     <select class="filter-select" onchange="filterStudSt(this.value)"><option value="">All Status</option><option>Enabled</option><option>Disabled</option><option>Flagged</option></select>
   </div>
-  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Student ID</th><th>Name</th><th>Department</th><th>Sem</th><th>Exams</th><th>Status / Access</th><th>Actions</th></tr></thead><tbody id="stud-tbl"></tbody></table></div></div>
+  <div class="card">
+    <div class="tbl-wrap mob-hide"><table><thead><tr><th>Student ID</th><th>Name</th><th>Department</th><th>Sem</th><th>Exams</th><th>Status / Access</th><th>Actions</th></tr></thead><tbody id="stud-tbl"></tbody></table></div>
+    <div class="mob-cards" style="display:none" id="stud-mob"></div>
+  </div>
 </div>
 
 <!-- ══ RESULTS ══ -->
 <div class="page" id="pg-results">
-  <div class="page-hd"><div><div class="page-title">Results</div><div class="page-sub">Latest graded exam results</div></div></div>
-  <div class="tab-bar" id="res-tabs"><button class="tab active" onclick="switchRes(this,'all')">All</button><button class="tab" onclick="switchRes(this,'pass')">Passed</button><button class="tab" onclick="switchRes(this,'fail')">Failed</button></div>
-  <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Student</th><th>Exam</th><th>Marks</th><th>Score</th><th>Grade</th><th>Status</th></tr></thead><tbody id="res-tbl"></tbody></table></div></div>
+  <div class="page-hd">
+    <div><div class="page-title">Results</div><div class="page-sub">Latest graded exam results</div></div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="res-filter-bar">
+    <div class="tab-bar" style="margin-bottom:0" id="res-tab-bar">
+      <button class="tab active" onclick="switchRes(this,'all')">All</button>
+      <button class="tab" onclick="switchRes(this,'pass')">Passed</button>
+      <button class="tab" onclick="switchRes(this,'fail')">Failed</button>
+    </div>
+    <div class="filter-search" style="flex:1;min-width:140px;max-width:300px">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input placeholder="Search student or exam…" oninput="filterResults(this.value)" id="res-search">
+    </div>
+    <select class="filter-select" id="res-exam-filter" onchange="filterResultsByExam(this.value)">
+      <option value="">All Exams</option>
+      <option>Data Structures</option><option>Calculus Final</option>
+      <option>World History</option><option>Organic Chem</option>
+      <option>Physics Mid-Term</option><option>English Lit</option>
+    </select>
+    <select class="filter-select" id="res-grade-filter" onchange="filterResultsByGrade(this.value)">
+      <option value="">All Grades</option>
+      <option>A+</option><option>A</option><option>B+</option>
+      <option>B</option><option>C</option><option>F</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <div class="tbl-wrap mob-hide">
+      <table>
+        <thead><tr><th>Student</th><th>Exam</th><th>Marks</th><th>Score</th><th>Grade</th><th>Status</th></tr></thead>
+        <tbody id="res-tbl"></tbody>
+      </table>
+    </div>
+    <div class="mob-cards" style="display:none" id="res-mob"></div>
+  </div>
 </div>
 
 <!-- ══ QUESTION BANK ══ -->
 <div class="page" id="pg-qb">
   <div class="page-hd"><div><div class="page-title">Question Bank</div><div class="page-sub">Manage and assign question sets to exams</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <button class="btn btn-outline" onclick="openM('m-qb-upload')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload File</button>
       <button class="btn btn-primary" onclick="openM('m-qb')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Question</button>
     </div>
@@ -822,7 +1100,7 @@ window.doLogout = function(){
       <div class="card"><div class="card-hd"><div class="card-title">Assign Set to Exam</div></div><div class="card-bd">
         <div class="form-group" style="margin-bottom:10px"><label class="form-label">Exam</label><select class="form-input"><option>Mid-Term Physics</option><option>Calculus Final</option></select></div>
         <div class="form-group" style="margin-bottom:12px"><label class="form-label">Question Set</label><select class="form-input"><option>QS-Physics-2025-A</option><option>QS-Math-2025</option></select></div>
-        <button class="btn btn-primary" style="width:100%" onclick="toast('✅','Question set assigned!')">Assign Set</button>
+        <button class="btn btn-primary btn-full" onclick="toast('✅','Question set assigned!')">Assign Set</button>
       </div></div>
     </div>
   </div>
@@ -837,9 +1115,11 @@ window.doLogout = function(){
     <div class="stat" style="cursor:default"><div class="stat-stripe" style="background:var(--amber)"></div><div class="stat-hd"><div class="stat-icon" style="background:var(--amber-lt);color:var(--amber)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="stat-val" style="color:var(--amber);font-size:22px">14</div><div class="stat-lbl">Absent</div></div>
     <div class="stat" style="cursor:default"><div class="stat-stripe" style="background:var(--blue)"></div><div class="stat-hd"><div class="stat-icon" style="background:var(--blue-lt);color:var(--blue)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="stat-val" style="color:var(--blue);font-size:22px">187</div><div class="stat-lbl">Submitted</div></div>
   </div>
-  <div class="alert a-err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><div><strong>Arjun Mehta</strong> — Tab switched 3 times during Calculus Final. <button class="btn btn-danger btn-sm" style="margin-left:8px" onclick="toast('⛔','Arjun Mehta terminated from exam.')">Terminate Exam</button></div></div>
-  <div class="card"><div class="card-hd"><div class="card-title">Live Candidate Monitor</div><div class="card-sub">Real-time SEB session tracking</div></div><div class="card-bd" style="padding-top:10px"><div class="tbl-wrap"><table><thead><tr><th>Candidate</th><th>Exam</th><th>Progress</th><th>Tab Switches</th><th>SEB Lock</th><th>Status</th><th>Action</th></tr></thead><tbody id="proc-tbl"></tbody></table></div></div></div>
-</div>
+  <div class="alert a-err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><div><strong>Arjun Mehta</strong> — Tab switched 3 times during Calculus Final. <button class="btn btn-danger btn-sm" onclick="toast('⛔','Arjun Mehta terminated from exam.')">Terminate Exam</button></div></div>
+  <div class="card"><div class="card-hd"><div class="card-title">Live Candidate Monitor</div><div class="card-sub">Real-time SEB session tracking</div></div><div class="card-bd" style="padding-top:10px">
+    <div class="tbl-wrap mob-hide"><table><thead><tr><th>Candidate</th><th>Exam</th><th>Progress</th><th>Tab Switches</th><th>SEB Lock</th><th>Status</th><th>Action</th></tr></thead><tbody id="proc-tbl"></tbody></table></div>
+    <div class="mob-cards" style="display:none" id="proc-mob"></div>
+  </div></div></div></div>
 
 <!-- ══ CUT-OFF ══ -->
 <div class="page" id="pg-cutoff">
@@ -866,7 +1146,7 @@ window.doLogout = function(){
       </div></div>
       <div class="card"><div class="card-hd"><div class="card-title">Subjective Marking</div></div><div class="card-bd">
         <div class="alert a-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div>12 long-answer responses awaiting manual marking</div></div>
-        <button class="btn btn-primary" style="width:100%" onclick="toast('📝','Marking panel ready in full system')">Open Marking Panel</button>
+        <button class="btn btn-primary btn-full" onclick="toast('📝','Marking panel ready in full system')">Open Marking Panel</button>
       </div></div>
     </div>
   </div>
@@ -881,19 +1161,25 @@ window.doLogout = function(){
     </div>
   </div>
   <div class="g2">
-    <div class="card"><div class="card-hd"><div class="card-title">Student Credentials</div></div><div class="card-bd" style="padding-top:10px"><div class="tbl-wrap"><table><thead><tr><th>Name</th><th>User ID</th><th>Password</th><th>Last Login</th><th>Access</th></tr></thead><tbody id="cred-tbl"></tbody></table></div></div></div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Student Credentials</div></div>
+      <div class="card-bd" style="padding-top:10px">
+        <div class="tbl-wrap mob-hide"><table><thead><tr><th>Name</th><th>User ID</th><th>Password</th><th>Last Login</th><th>Access</th></tr></thead><tbody id="cred-tbl"></tbody></table></div>
+        <div class="mob-cards" style="display:none" id="cred-mob"></div>
+      </div>
+    </div>
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="card"><div class="card-hd"><div class="card-title">Add Invigilator</div></div><div class="card-bd">
         <div class="form-group" style="margin-bottom:10px"><label class="form-label">Full Name</label><input class="form-input" placeholder="Invigilator name"></div>
         <div class="form-group" style="margin-bottom:10px"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="email@school.in"></div>
         <div class="form-group" style="margin-bottom:10px"><label class="form-label">Assign Hall</label><select class="form-input"><option>Hall A</option><option>Hall B</option><option>Hall C</option><option>Online</option></select></div>
         <div class="form-group" style="margin-bottom:12px"><label class="form-label">Assign Exam</label><select class="form-input"><option>Mid-Term Physics</option><option>Calculus Final</option></select></div>
-        <button class="btn btn-primary" style="width:100%" onclick="toast('✅','Invigilator added & credentials sent!')">Add Invigilator</button>
+        <button class="btn btn-primary btn-full" onclick="toast('✅','Invigilator added & credentials sent!')">Add Invigilator</button>
       </div></div>
       <div class="card"><div class="card-hd"><div class="card-title">Reset Password</div></div><div class="card-bd">
         <div class="form-group" style="margin-bottom:10px"><label class="form-label">Student ID</label><input class="form-input" placeholder="STU2025001"></div>
         <div class="form-group" style="margin-bottom:12px"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="New password"></div>
-        <button class="btn btn-outline" style="width:100%" onclick="toast('🔑','Password reset successfully!')">Reset Password</button>
+        <button class="btn btn-outline btn-full" onclick="toast('🔑','Password reset successfully!')">Reset Password</button>
       </div></div>
     </div>
   </div>
@@ -908,7 +1194,7 @@ window.doLogout = function(){
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Channel</label><div style="display:flex;gap:18px;margin-top:6px"><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:500"><input type="checkbox" checked>Email</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:500"><input type="checkbox" checked>Portal</label><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;font-weight:500"><input type="checkbox">SMS</label></div></div>
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Subject</label><input class="form-input" placeholder="Notice subject…"></div>
       <div class="form-group" style="margin-bottom:14px"><label class="form-label">Message</label><textarea class="form-input" rows="5" placeholder="Type your notice here…"></textarea></div>
-      <div style="display:flex;gap:8px"><button class="btn btn-outline" onclick="toast('📅','Notice scheduled!')">Schedule</button><button class="btn btn-primary" onclick="toast('✅','Notice sent to all students!')">Send Now</button></div>
+      <div style="display:flex;gap:8px"><button class="btn btn-outline" style="flex:1" onclick="toast('📅','Notice scheduled!')">Schedule</button><button class="btn btn-primary" style="flex:1" onclick="toast('✅','Notice sent to all students!')">Send Now</button></div>
     </div></div>
     <div class="card"><div class="card-hd"><div class="card-title">Notice History</div></div><div class="card-bd" id="notice-hist"></div></div>
   </div>
@@ -926,13 +1212,13 @@ window.doLogout = function(){
           <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13.5px;font-weight:700;color:var(--text)">Auto-publish Results</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Publish MCQ results automatically after exam</div></div><label class="toggle"><input type="checkbox"><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0"><div><div style="font-size:13.5px;font-weight:700;color:var(--text)">Email Notifications</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Send result emails to students</div></div><label class="toggle"><input type="checkbox" checked><span class="tog-track"></span><span class="tog-thumb"></span></label></div>
         </div>
-        <button class="btn btn-primary" style="margin-top:6px" onclick="toast('✅','Settings saved!')">Save Changes</button>
+        <button class="btn btn-primary btn-full" onclick="toast('✅','Settings saved!')">Save Changes</button>
       </div></div>
       <div class="card"><div class="card-hd"><div class="card-title">Institution Info</div></div><div class="card-bd">
         <div class="form-group" style="margin-bottom:10px"><label class="form-label">Institution Name</label><input class="form-input" value="Mysuru Institute of Technology"></div>
         <div class="form-group" style="margin-bottom:10px"><label class="form-label">Admin Email</label><input class="form-input" value="admin@sebportal.in"></div>
         <div class="form-group" style="margin-bottom:14px"><label class="form-label">Portal URL</label><input class="form-input" value="https://exam.sebportal.in"></div>
-        <button class="btn btn-primary" onclick="toast('✅','Institution info updated!')">Update Info</button>
+        <button class="btn btn-primary btn-full" onclick="toast('✅','Institution info updated!')">Update Info</button>
       </div></div>
     </div>
     <div class="card"><div class="card-hd"><div class="card-title">Content Delivery Engine</div><div class="card-sub">CDE system config — from your blueprint</div></div><div class="card-bd">
@@ -1009,7 +1295,14 @@ const PROCTOR=[
 /* ── HELPERS ── */
 const subColors={Physics:'#7c3aed',Maths:'#0891b2',English:'#d97706',Chemistry:'#059669',History:'#dc2626',CS:'#1a56db',Biology:'#d97706'};
 const subBg={Physics:'#f5f3ff',Maths:'#ecfeff',English:'#fffbeb',Chemistry:'#ecfdf5',History:'#fef2f2',CS:'#eff6ff',Biology:'#fffbeb'};
-const stPill={'Live':'<span class="pill p-live"><span class="pill-dot"></span>Live</span>','Upcoming':'<span class="pill p-upcoming"><span class="pill-dot"></span>Upcoming</span>','Ended':'<span class="pill p-ended"><span class="pill-dot"></span>Ended</span>','Graded':'<span class="pill p-graded"><span class="pill-dot"></span>Graded</span>','Flagged':'<span class="pill p-flagged"><span class="pill-dot"></span>Flagged</span>'};
+const stPill={
+  'Live':    '<span class="pill p-live"><span class="pill-dot" style="background:var(--green)"></span>Live</span>',
+  'Upcoming':'<span class="pill p-upcoming"><span class="pill-dot" style="background:var(--amber)"></span>Upcoming</span>',
+  'Ended':   '<span class="pill p-ended"><span class="pill-dot" style="background:var(--text3)"></span>Ended</span>',
+  'Graded':  '<span class="pill p-graded"><span class="pill-dot" style="background:var(--blue)"></span>Graded</span>',
+  'OK':      '<span class="pill p-ok"><span class="pill-dot" style="background:var(--green)"></span>OK</span>',
+  'Flagged': '<span class="pill p-flagged"><span class="pill-dot" style="background:var(--red)"></span>Flagged</span>',
+};
 const diffColor={Easy:'#059669',Medium:'#d97706',Hard:'#dc2626'};
 const gradeColor={'A+':'#7c3aed','A':'#1a56db','B+':'#059669','B':'#059669','C':'#d97706','F':'#dc2626'};
 function sTag(s){return`<span class="s-tag" style="background:${subBg[s]||'#f3f4f6'};color:${subColors[s]||'#374151'}">${s}</span>`}
@@ -1017,16 +1310,34 @@ function scoreBar(pct){const c=pct>=60?'var(--green)':pct>=40?'var(--amber)':'va
 
 /* ── RENDERS ── */
 function renderDashTbl(){
-  document.getElementById('dash-tbl').innerHTML=EXAMS.slice(0,5).map(e=>`<tr>
+  const list = EXAMS.slice(0,5);
+  document.getElementById('dash-tbl').innerHTML=list.map(e=>`<tr>
     <td style="font-weight:700;font-size:13px">${e.title}</td>
     <td style="color:var(--text2)">${e.students}</td>
     <td>${stPill[e.status]||''}</td>
     <td style="font-family:'DM Mono',monospace;font-size:12px">${e.cutoff}/100</td>
-    <td><button class="btn btn-outline btn-sm" onclick="toast('🔒','${e.title} action triggered!')">${e.status==='Live'?'End Exam':'Control'}</button></td>
+    <td><button class="btn btn-outline btn-sm" style="min-width:80px;justify-content:center" onclick="toast('🔒','${e.title} action triggered!')">${e.status==='Live'?'End Exam':'Control'}</button></td>
   </tr>`).join('');
+
+  // Mobile cards for dashboard
+  const mob = list.map(e=>`
+    <div class="mob-card" style="border-left:3px solid ${e.status==='Live'?'var(--green)':e.status==='Upcoming'?'var(--amber)':'var(--text3)'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:13px;font-weight:800;color:var(--text)">${e.title}</div>
+        ${stPill[e.status]||''}
+      </div>
+      <div class="mob-card-row"><span class="mob-card-label">Students</span><span class="mob-card-val">${e.students}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Cut-off</span><span class="mob-card-val" style="font-family:'DM Mono',monospace">${e.cutoff}/100</span></div>
+      <div class="mob-card-actions">
+        <button class="btn btn-outline btn-full" onclick="toast('🔒','${e.title} action triggered!')">${e.status==='Live'?'⛔ End Exam':'⚙️ Control'}</button>
+      </div>
+    </div>`).join('');
+  const mobEl = document.getElementById('dash-mob');
+  if(mobEl) mobEl.innerHTML = mob;
 }
 function renderExamTbl(data){
-  (document.getElementById('exam-tbl')).innerHTML=(data||EXAMS).map(e=>`<tr>
+  const list = data||EXAMS;
+  (document.getElementById('exam-tbl')).innerHTML=list.map(e=>`<tr>
     <td style="font-weight:700;font-size:13px">${e.title}</td>
     <td>${sTag(e.sub)}</td>
     <td style="font-size:12px;color:var(--text2)">${e.date}</td>
@@ -1034,12 +1345,37 @@ function renderExamTbl(data){
     <td style="color:var(--text2)">${e.students}</td>
     <td style="font-family:'DM Mono',monospace;font-size:12px">${e.cutoff}</td>
     <td>${stPill[e.status]||''}</td>
-    <td><span style="font-size:12px;font-weight:700;color:${e.proctor?'var(--green)':'var(--text3)'}">${e.proctor?'✓ On':'Off'}</span></td>
-    <td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm" onclick="toast('✏️','Editing ${e.title}')">Edit</button><button class="btn btn-danger btn-sm" onclick="toast('🗑️','${e.title} deleted!')">Del</button></div></td>
+    <td><span class="pill ${e.proctor?'p-ok':'p-ended'}" style="min-width:60px">${e.proctor?'✓ On':'Off'}</span></td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-outline btn-sm" style="min-width:46px" onclick="toast('✏️','Editing ${e.title}')">Edit</button>
+      <button class="btn btn-danger btn-sm" style="min-width:38px" onclick="toast('🗑️','${e.title} deleted!')">Del</button>
+    </div></td>
   </tr>`).join('');
+
+  // Mobile cards
+  const mob = list.map(e=>`
+    <div class="mob-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div class="mob-card-name" style="margin-bottom:0">${e.title}</div>
+        ${stPill[e.status]||''}
+      </div>
+      <div class="mob-card-row"><span class="mob-card-label">Subject</span><span class="mob-card-val">${sTag(e.sub)}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Date</span><span class="mob-card-val">${e.date}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Duration</span><span class="mob-card-val">${e.dur} min</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Students</span><span class="mob-card-val">${e.students}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Cut-off</span><span class="mob-card-val">${e.cutoff}/100</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Proctor</span><span class="mob-card-val" style="color:${e.proctor?'var(--green)':'var(--text3)'}">${e.proctor?'✓ On':'Off'}</span></div>
+      <div class="mob-card-actions">
+        <button class="btn btn-outline" onclick="toast('✏️','Editing ${e.title}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="toast('🗑️','${e.title} deleted!')">🗑️ Delete</button>
+      </div>
+    </div>`).join('');
+  const mobEl = document.getElementById('exam-mob');
+  if(mobEl) mobEl.innerHTML = mob;
 }
 function renderStudents(data){
-  document.getElementById('stud-tbl').innerHTML=(data||STUDENTS).map((s,idx)=>`<tr id="stud-row-${idx}">
+  const list = data||STUDENTS;
+  document.getElementById('stud-tbl').innerHTML=list.map((s,idx)=>`<tr id="stud-row-${idx}">
     <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)">${s.id}</td>
     <td style="font-weight:700;font-size:13px">${s.name}${s.flagged?'<span class="pill p-flagged" style="margin-left:6px;font-size:9.5px">⚑ Flagged</span>':''}</td>
     <td style="color:var(--text2)">${s.dept}</td>
@@ -1054,11 +1390,36 @@ function renderStudents(data){
       </div>
     </td>
     <td><div style="display:flex;gap:4px;flex-wrap:nowrap">
-      <button class="btn btn-outline btn-sm" onclick="toast('🎫','Admit card for ${s.name}!')">🎫 Admit</button>
-      <button class="btn btn-outline btn-sm" onclick="toast('🔑','Password reset for ${s.name}!')">Reset</button>
-      <button class="btn btn-danger btn-sm" onclick="toast('⛔','${s.name} removed!')">Remove</button>
+      <button class="btn btn-outline btn-sm" style="min-width:60px;justify-content:center" onclick="toast('🎫','Admit card for ${s.name}!')">🎫 Admit</button>
+      <button class="btn btn-outline btn-sm" style="min-width:52px;justify-content:center" onclick="toast('🔑','Password reset for ${s.name}!')">Reset</button>
+      <button class="btn btn-danger btn-sm" style="min-width:60px;justify-content:center" onclick="toast('⛔','${s.name} removed!')">Remove</button>
     </div></td>
   </tr>`).join('');
+
+  // Mobile cards
+  const mob = list.map((s,idx)=>`
+    <div class="mob-card" style="border-left:3px solid ${s.flagged?'var(--red)':s.enabled?'var(--green)':'var(--text3)'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
+        <div style="font-size:14px;font-weight:800;color:var(--text)">${s.name}${s.flagged?'<span class="pill p-flagged" style="margin-left:6px;font-size:9.5px">⚑</span>':''}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="stud-tog" onclick="toggleStudentAccess(this,${idx},'${s.name}')" style="position:relative;width:38px;height:21px;flex-shrink:0;border-radius:20px;cursor:pointer;background:${s.enabled?'var(--primary)':'#d1d5db'};border:1.5px solid ${s.enabled?'var(--primary)':'#9ca3af'}">
+            <div style="position:absolute;top:2px;left:${s.enabled?'18':'2'}px;width:13px;height:13px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.25)"></div>
+          </div>
+          <span class="stud-lbl" style="font-size:12px;font-weight:700;color:${s.enabled?'var(--green)':'var(--text3)'}">${s.enabled?'Enabled':'Disabled'}</span>
+        </div>
+      </div>
+      <div class="mob-card-row"><span class="mob-card-label">ID</span><span class="mob-card-val" style="font-family:'DM Mono',monospace;font-size:12px">${s.id}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Department</span><span class="mob-card-val">${s.dept}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Semester</span><span class="mob-card-val">${s.sem}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Exams</span><span class="mob-card-val">${s.exams}</span></div>
+      <div class="mob-card-actions">
+        <button class="btn btn-outline" onclick="toast('🎫','Admit card for ${s.name}!')">🎫 Admit</button>
+        <button class="btn btn-outline" onclick="toast('🔑','Reset password')">🔑 Reset</button>
+        <button class="btn btn-danger" onclick="toast('⛔','${s.name} removed!')">Remove</button>
+      </div>
+    </div>`).join('');
+  const mobEl = document.getElementById('stud-mob');
+  if(mobEl) mobEl.innerHTML = mob;
 }
 window.toggleStudentAccess=function(togEl,idx,name){
   const s=STUDENTS[idx];
@@ -1079,19 +1440,6 @@ window.toggleStudentAccess=function(togEl,idx,name){
   }
   toast(s.enabled?'✅':'⛔',(s.enabled?'Access enabled':'Access disabled')+' for '+name);
 };
-function renderResults(f){
-  let d=RESULTS;
-  if(f==='pass')d=RESULTS.filter(r=>r.marks>=40);
-  if(f==='fail')d=RESULTS.filter(r=>r.marks<40);
-  document.getElementById('res-tbl').innerHTML=d.map(r=>{const pct=Math.round(r.marks/r.total*100);return`<tr>
-    <td style="font-weight:700;font-size:13px">${r.name}</td>
-    <td style="color:var(--text2);font-size:12.5px">${r.exam}</td>
-    <td style="font-family:'DM Mono',monospace">${r.marks}/${r.total}</td>
-    <td style="min-width:120px">${scoreBar(pct)}</td>
-    <td style="font-weight:800;font-size:14px;color:${gradeColor[r.grade]||'var(--text)'}">${r.grade}</td>
-    <td>${r.marks>=40?'<span class="pill p-on"><span class="pill-dot"></span>Passed</span>':'<span class="pill p-off"><span class="pill-dot"></span>Failed</span>'}</td>
-  </tr>`}).join('');
-}
 function renderQB(){
   document.getElementById('qb-tbl').innerHTML=QB.map(q=>`<tr>
     <td style="font-family:'DM Mono',monospace;color:var(--text3)">${q.n}</td>
@@ -1104,16 +1452,34 @@ function renderQB(){
   </tr>`).join('');
 }
 function renderProctor(){
-  document.getElementById('proc-tbl').innerHTML=PROCTOR.map(p=>`<tr>
+  const rows = PROCTOR.map(p=>`<tr>
     <td style="font-weight:700;font-size:13px">${p.name}</td>
     <td style="color:var(--text2);font-size:12px">${p.exam}</td>
-    <td style="min-width:100px">${scoreBar(p.prog)}</td>
-    <td style="font-family:'DM Mono',monospace;font-weight:700;color:${p.tabs>0?'var(--red)':'var(--green)'}">${p.tabs}</td>
-    <td><span style="font-size:12.5px;font-weight:700;color:${p.seb?'var(--green)':'var(--red)'}">${p.seb?'✓ Active':'✗ Off'}</span></td>
-    <td>${stPill[p.status]||'<span class="pill p-on">OK</span>'}</td>
-    <td><div style="display:flex;gap:4px">${p.status==='Flagged'?`<button class="btn btn-danger btn-sm" onclick="toast('⛔','${p.name} terminated!')">Terminate</button>`:''}
-    <button class="btn btn-outline btn-sm" onclick="toast('💬','Warning sent to ${p.name}!')">Warn</button></div></td>
+    <td style="min-width:110px">${scoreBar(p.prog)}</td>
+    <td style="text-align:center;font-family:'DM Mono',monospace;font-weight:800;font-size:14px;color:${p.tabs>0?'var(--red)':'var(--green)'}">${p.tabs}</td>
+    <td><span class="pill ${p.seb?'p-ok':'p-off'}" style="min-width:80px">${p.seb?'✓ Active':'✗ Off'}</span></td>
+    <td>${stPill[p.status]||stPill['OK']}</td>
+    <td><div style="display:flex;gap:4px">
+      ${p.status==='Flagged'?`<button class="btn btn-danger btn-sm" style="min-width:78px;justify-content:center" onclick="toast('⛔','${p.name} terminated!')">Terminate</button>`:'<button class="btn btn-outline btn-sm" style="min-width:78px;justify-content:center;visibility:hidden">Terminate</button>'}
+      <button class="btn btn-outline btn-sm" style="min-width:56px;justify-content:center" onclick="toast('💬','Warning sent to ${p.name}!')">Warn</button>
+    </div></td>
   </tr>`).join('');
+  document.getElementById('proc-tbl').innerHTML = rows;
+
+  // Mobile cards
+  const mob = PROCTOR.map(p=>`
+    <div class="mob-card" style="border-left:3px solid ${p.status==='Flagged'?'var(--red)':'var(--green)'}">
+      <div class="mob-card-name">${p.name} ${p.status==='Flagged'?'<span class="pill p-flagged" style="font-size:9.5px">⚑ Flagged</span>':''}</div>
+      <div class="mob-card-row"><span class="mob-card-label">Exam</span><span class="mob-card-val">${p.exam}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Progress</span><span class="mob-card-val" style="font-weight:700;color:${p.prog>=60?'var(--green)':p.prog>=40?'var(--amber)':'var(--red)'}">${p.prog}%</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Tab Switches</span><span class="mob-card-val" style="font-weight:700;color:${p.tabs>0?'var(--red)':'var(--green)'}">${p.tabs}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">SEB Lock</span><span class="mob-card-val" style="color:${p.seb?'var(--green)':'var(--red)'};">${p.seb?'✓ Active':'✗ Off'}</span></div>
+      <div class="mob-card-actions">
+        ${p.status==='Flagged'?`<button class="btn btn-danger" onclick="toast('⛔','${p.name} terminated!')">⛔ Terminate</button>`:''}
+        <button class="btn btn-outline" onclick="toast('💬','Warning sent to ${p.name}!')">💬 Warn</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('proc-mob').innerHTML = mob;
 }
 function renderCreds(){
   document.getElementById('cred-tbl').innerHTML=STUDENTS.slice(0,6).map(s=>`<tr>
@@ -1121,8 +1487,22 @@ function renderCreds(){
     <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${s.id}</td>
     <td style="font-family:'DM Mono',monospace;color:var(--text3)">••••••••</td>
     <td style="color:var(--text3);font-size:12px">Today 9:42 AM</td>
-    <td>${s.enabled?'<span class="pill p-on"><span class="pill-dot"></span>Active</span>':'<span class="pill p-off"><span class="pill-dot"></span>Disabled</span>'}</td>
+    <td>${s.enabled?'<span class="pill p-on" style="min-width:80px"><span class="pill-dot" style="background:var(--green)"></span>Active</span>':'<span class="pill p-off" style="min-width:80px"><span class="pill-dot" style="background:var(--red)"></span>Disabled</span>'}</td>
   </tr>`).join('');
+
+  // Mobile cards for credentials
+  const mob = STUDENTS.slice(0,6).map(s=>`
+    <div class="mob-card" style="border-left:3px solid ${s.enabled?'var(--green)':'var(--red)'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:14px;font-weight:800;color:var(--text)">${s.name}</div>
+        ${s.enabled?'<span class="pill p-on" style="min-width:80px"><span class="pill-dot" style="background:var(--green)"></span>Active</span>':'<span class="pill p-off" style="min-width:80px"><span class="pill-dot" style="background:var(--red)"></span>Disabled</span>'}
+      </div>
+      <div class="mob-card-row"><span class="mob-card-label">User ID</span><span class="mob-card-val" style="font-family:'DM Mono',monospace;font-size:12px">${s.id}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Password</span><span class="mob-card-val" style="font-family:'DM Mono',monospace;color:var(--text3)">••••••••</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Last Login</span><span class="mob-card-val" style="font-size:12px;color:var(--text3)">Today 9:42 AM</span></div>
+    </div>`).join('');
+  const mobEl = document.getElementById('cred-mob');
+  if(mobEl) mobEl.innerHTML = mob;
 }
 function renderFeed(){
   const feed=[
@@ -1148,17 +1528,102 @@ function renderNoticeHist(){
 }
 
 /* ── CHART ── */
-Chart.defaults.color='#6b7280';Chart.defaults.borderColor='rgba(0,0,0,0.06)';Chart.defaults.font.family="'DM Sans',sans-serif";Chart.defaults.font.size=12;
-const chartData={week:[78,72,84,65,74,80,70],month:[74,68,80,62,71,76,68]};
+/* ── DASHBOARD SCORE LINE CHART ── */
+function getLast7DayLabels(){
+  const d=[];
+  for(let i=6;i>=0;i--){
+    const dt=new Date();dt.setDate(dt.getDate()-i);
+    d.push(dt.toLocaleDateString('en-IN',{day:'numeric',month:'short'}));
+  }
+  return d;
+}
+
+const dashChartData={
+  all:       [68,62,0,0,74,78,82],
+  Physics:   [60,55,0,0,68,72,78],
+  Maths:     [72,68,0,0,76,79,84],
+  English:   [74,70,0,0,80,83,88],
+  Chemistry: [58,54,0,0,64,68,72],
+  History:   [65,60,0,0,70,74,80],
+  CS:        [78,74,0,0,82,84,90],
+  Biology:   [62,58,0,0,68,71,76],
+};
+
 let barChart;
 function initChart(){
-  const ctx=document.getElementById('barChart').getContext('2d');
-  barChart=new Chart(ctx,{type:'bar',data:{labels:['Physics','Maths','English','Chem','History','CS','Biology'],datasets:[{data:chartData.week,backgroundColor:v=>v.raw>=80?'rgba(5,150,105,0.7)':v.raw>=65?'rgba(26,86,219,0.7)':'rgba(220,38,38,0.6)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' Avg Score: '+c.raw+'%'}}},scales:{x:{grid:{display:false},border:{display:false}},y:{min:0,max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}}}}});
+  const ctx=document.getElementById('barChart');
+  if(!ctx)return;
+  barChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:getLast7DayLabels(),
+      datasets:[{
+        label:'Avg Score (%)',
+        data:dashChartData.all,
+        borderColor:'#1a56db',
+        backgroundColor:'rgba(26,86,219,0.13)',
+        borderWidth:3,
+        pointBackgroundColor:'#1a56db',
+        pointBorderColor:'#fff',
+        pointBorderWidth:2.5,
+        pointRadius:6,
+        pointHoverRadius:8,
+        fill:true,
+        tension:0.38,
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          display:true,
+          position:'top',
+          align:'start',
+          labels:{font:{size:12,weight:'700'},color:'#374151',boxWidth:22,boxHeight:12,padding:14}
+        },
+        tooltip:{
+          backgroundColor:'#1e293b',
+          titleColor:'#f1f5f9',
+          bodyColor:'#94a3b8',
+          padding:12,cornerRadius:8,
+          callbacks:{
+            title:i=>i[0].label,
+            label:i=>' Avg Score: '+i.raw+'%  '+(i.raw>=80?'🟢 Excellent':i.raw>=65?'🔵 Good':i.raw===0?'—':'🔴 Needs attention')
+          }
+        }
+      },
+      scales:{
+        x:{
+          grid:{color:'rgba(0,0,0,0.04)',drawBorder:false},
+          border:{display:false},
+          ticks:{font:{size:10,weight:'600'},color:'#6b7280',maxRotation:40,minRotation:20}
+        },
+        y:{
+          min:0,max:100,
+          ticks:{callback:v=>v+'%',stepSize:20,font:{size:10},color:'#9ca3af'},
+          grid:{color:'rgba(0,0,0,0.05)',drawBorder:false},
+          border:{display:false}
+        }
+      },
+      animation:{duration:700,easing:'easeOutQuart'}
+    }
+  });
 }
-window.switchChart=function(k,btn){
-  document.querySelectorAll('#pg-dash .tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
-  barChart.data.datasets[0].data=chartData[k];barChart.update();
+window.switchDashChart=function(subject, btn){
+  if(btn){
+    document.querySelectorAll('#pg-dash .tab-bar .tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if(!barChart)return;
+  const key=subject||'all';
+  barChart.data.datasets[0].data=dashChartData[key]||dashChartData.all;
+  barChart.data.datasets[0].label=(key==='all'?'All Subjects':key)+' — Avg Score (%)';
+  barChart.data.labels=getLast7DayLabels();
+  barChart.update('active');
 };
+// keep switchChart as no-op for any old references
+window.switchChart=function(){};
 
 /* ── NAV ── */
 const titles={'pg-dash':'Dashboard','pg-exams':'Exam Manager','pg-students':'Students','pg-results':'Results','pg-qb':'Question Bank','pg-proctor':'Proctoring','pg-cutoff':'Cut-off & Grading','pg-users':'User IDs & Access','pg-notices':'Notices & Email','pg-settings':'Settings'};
@@ -1168,7 +1633,13 @@ window.nav=function(el,id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById(id);if(pg)pg.classList.add('active');
   document.getElementById('tb-title').textContent=titles[id]||id;
-  if(window.innerWidth<=800)closeSb();
+  // Always close sidebar on mobile after nav click
+  closeSb();
+  // Scroll content to top
+  const content=document.querySelector('.content');
+  if(content)content.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
+  applyMobileLayout();
 };
 
 /* ── SIDEBAR ── */
@@ -1188,7 +1659,6 @@ window.filterExams=function(q){renderExamTbl(EXAMS.filter(e=>e.title.toLowerCase
 window.filterExamSt=function(s){renderExamTbl(s?EXAMS.filter(e=>e.status===s):null)};
 window.filterStudents=function(q){renderStudents(STUDENTS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.id.toLowerCase().includes(q.toLowerCase())))};
 window.filterStudSt=function(s){renderStudents(s?STUDENTS.filter(st=>s==='Flagged'?st.flagged:s==='Enabled'?st.enabled:!st.enabled):null)};
-window.switchRes=function(btn,f){document.querySelectorAll('#res-tabs .tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderResults(f)};
 
 /* ── SESSION INFO ── */
 (function(){
@@ -1221,6 +1691,69 @@ setInterval(()=>{
 
 /* ── COUNT UP ── */
 function countUp(el,target){let c=0;const step=Math.ceil(target/40);const t=setInterval(()=>{c=Math.min(c+step,target);el.textContent=c.toLocaleString();if(c>=target)clearInterval(t);},25);}
+/* ── RESULTS FILTER STATE ── */
+let _resFilter='all',_resSearch='',_resExam='',_resGrade='';
+
+function renderFilteredResults(){
+  let d=RESULTS;
+  if(_resFilter==='pass') d=d.filter(r=>r.marks>=40);
+  if(_resFilter==='fail') d=d.filter(r=>r.marks<40);
+  if(_resSearch) d=d.filter(r=>r.name.toLowerCase().includes(_resSearch)||r.exam.toLowerCase().includes(_resSearch));
+  if(_resExam)   d=d.filter(r=>r.exam===_resExam);
+  if(_resGrade)  d=d.filter(r=>r.grade===_resGrade);
+  renderResultsData(d);
+}
+window.filterResults=function(v){_resSearch=v.toLowerCase();renderFilteredResults();}
+window.filterResultsByExam=function(v){_resExam=v;renderFilteredResults();}
+window.filterResultsByGrade=function(v){_resGrade=v;renderFilteredResults();}
+
+function switchRes(btn,f){
+  document.querySelectorAll('#res-tab-bar .tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  _resFilter=f;
+  _resSearch=document.getElementById('res-search')?.value.toLowerCase()||'';
+  renderFilteredResults();
+}
+function renderResults(f){
+  _resFilter=f||'all';
+  renderFilteredResults();
+}
+
+function renderResultsData(d){
+  // Table rows
+  document.getElementById('res-tbl').innerHTML=d.map(r=>{
+    const pct=Math.round(r.marks/r.total*100);
+    return`<tr>
+      <td style="font-weight:700;font-size:13px">${r.name}</td>
+      <td style="color:var(--text2);font-size:12.5px">${r.exam}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:600">${r.marks}/${r.total}</td>
+      <td style="min-width:110px">${scoreBar(pct)}</td>
+      <td style="font-weight:800;font-size:15px;color:${gradeColor[r.grade]||'var(--text)'}">${r.grade}</td>
+      <td>${r.marks>=40
+        ?'<span class="pill p-on"><span class="pill-dot"></span>Passed</span>'
+        :'<span class="pill p-off"><span class="pill-dot"></span>Failed</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  // Mobile cards
+  const mob=d.map(r=>{
+    const pct=Math.round(r.marks/r.total*100);
+    return`<div class="mob-card" style="border-left:3px solid ${r.marks>=40?'var(--green)':'var(--red)'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:14px;font-weight:800;color:var(--text)">${r.name}</div>
+        <div style="font-size:22px;font-weight:800;color:${gradeColor[r.grade]||'var(--text)'}">${r.grade}</div>
+      </div>
+      <div class="mob-card-row"><span class="mob-card-label">Exam</span><span class="mob-card-val">${r.exam}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Marks</span><span class="mob-card-val" style="font-family:'DM Mono',monospace;font-weight:700">${r.marks}/${r.total}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Score</span><span class="mob-card-val">${scoreBar(pct)}</span></div>
+      <div class="mob-card-row"><span class="mob-card-label">Result</span><span class="mob-card-val">${r.marks>=40
+        ?'<span class="pill p-on"><span class="pill-dot"></span>Passed</span>'
+        :'<span class="pill p-off"><span class="pill-dot"></span>Failed</span>'}</span></div>
+    </div>`;
+  }).join('');
+  const mobEl=document.getElementById('res-mob');
+  if(mobEl)mobEl.innerHTML=mob;
+}
 
 /* ══════════════ QUESTION BANK FILE UPLOAD ══════════════ */
 let QB_FILES = [];
@@ -1469,6 +2002,26 @@ window.printAdmitCard=function(){
     <div style="border:2px solid #1a56db;border-radius:12px;padding:20px;background:#fff">${cardHTML}</div></div></body></html>`);
   w.document.close();
 };
+
+/* ── RESPONSIVE TABLE ↔ CARD SWITCHER ── */
+function applyMobileLayout(){
+  const mobile = window.innerWidth <= 600;
+  [
+    ['dash-tbl','dash-mob'],
+    ['exam-tbl','exam-mob'],
+    ['stud-tbl','stud-mob'],
+    ['res-tbl','res-mob'],
+    ['proc-tbl','proc-mob'],
+    ['cred-tbl','cred-mob'],
+  ].forEach(([tblId, mobId])=>{
+    const tblWrap = document.getElementById(tblId)?.closest('.tbl-wrap');
+    const mobDiv  = document.getElementById(mobId);
+    if(tblWrap) tblWrap.style.display = mobile ? 'none' : '';
+    if(mobDiv)  mobDiv.style.display  = mobile ? 'flex' : 'none';
+  });
+}
+window.addEventListener('resize', applyMobileLayout);
+applyMobileLayout();
 
 /* ── INIT ── */
 renderDashTbl();renderFeed();renderSubjProg();renderUpcoming();
